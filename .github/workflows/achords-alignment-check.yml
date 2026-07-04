@@ -78,7 +78,7 @@ jobs:
           for file in "${json_files[@]}"; do
             if python3 -m json.tool "$file" > /dev/null 2>&1; then
               echo "✓ $file"
-              ((json_valid++))
+              json_valid=$((json_valid + 1))
             else
               echo "✗ INVALID JSON: $file"
             fi
