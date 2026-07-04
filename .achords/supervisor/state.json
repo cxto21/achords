@@ -1,0 +1,8 @@
+{
+  "mode": "advisory",
+  "enabled": true,
+  "last_alignment_check": "2026-07-04T00:00:00Z",
+  "alignment_status": "initialized",
+  "pending_reviews": [],
+  "blocked_merges": []
+}

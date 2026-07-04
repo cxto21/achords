@@ -1,0 +1,205 @@
+name: Achords Alignment Check
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+  push:
+    branches:
+      - main
+
+jobs:
+  alignment-verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+      
+      - name: Achords Alignment Verify
+        id: alignment
+        run: |
+          echo "=== Achords Alignment Check ==="
+          
+          # List of required Achords files
+          required_files=(
+            ".achords/ACHORDS.md"
+            ".achords/version.json"
+            ".achords/registry.json"
+            ".achords/claims.json"
+            ".achords/topology.json"
+            ".achords/policies.json"
+            ".achords/events.ndjson"
+            ".achords/supervisor/state.json"
+            ".achords/schemas/agent-profile.schema.json"
+            ".achords/schemas/agent-state.schema.json"
+            ".achords/schemas/claim.schema.json"
+            ".achords/schemas/message.schema.json"
+          )
+          
+          echo "Checking required files..."
+          files_present=0
+          for file in "${required_files[@]}"; do
+            if [ -f "$file" ]; then
+              echo "✓ $file"
+              ((files_present++))
+            else
+              echo "✗ MISSING: $file"
+            fi
+          done
+          
+          total_files=${#required_files[@]}
+          echo "Files present: $files_present/$total_files"
+          
+          if [ $files_present -lt $total_files ]; then
+            echo "::error::Missing required Achords files"
+            exit 1
+          fi
+          
+          # Validate JSON syntax for all protocol files
+          echo ""
+          echo "Validating JSON syntax..."
+          json_files=(
+            ".achords/version.json"
+            ".achords/registry.json"
+            ".achords/claims.json"
+            ".achords/topology.json"
+            ".achords/policies.json"
+            ".achords/supervisor/state.json"
+            ".achords/schemas/agent-profile.schema.json"
+            ".achords/schemas/agent-state.schema.json"
+            ".achords/schemas/claim.schema.json"
+            ".achords/schemas/message.schema.json"
+          )
+          
+          json_valid=0
+          for file in "${json_files[@]}"; do
+            if python3 -m json.tool "$file" > /dev/null 2>&1; then
+              echo "✓ $file"
+              ((json_valid++))
+            else
+              echo "✗ INVALID JSON: $file"
+            fi
+          done
+          
+          total_json=${#json_files[@]}
+          echo "Valid JSON files: $json_valid/$total_json"
+          
+          if [ $json_valid -lt $total_json ]; then
+            echo "::error::JSON validation failed"
+            exit 1
+          fi
+          
+          # Validate NDJSON syntax (newline-delimited JSON)
+          echo ""
+          echo "Validating events.ndjson..."
+          if [ -f ".achords/events.ndjson" ]; then
+            ndjson_valid=true
+            while IFS= read -r line; do
+              if [ ! -z "$line" ]; then
+                if ! echo "$line" | python3 -m json.tool > /dev/null 2>&1; then
+                  echo "✗ Invalid JSON line: $line"
+                  ndjson_valid=false
+                fi
+              fi
+            done < ".achords/events.ndjson"
+            
+            if [ "$ndjson_valid" = true ]; then
+              echo "✓ events.ndjson is valid"
+            else
+              echo "::error::events.ndjson has invalid lines"
+              exit 1
+            fi
+          fi
+          
+          # Check for claim collisions
+          echo ""
+          echo "Checking for claim collisions..."
+          python3 << 'EOF'
+          import json
+          from pathlib import Path
+          import fnmatch
+          
+          claims_file = Path('.achords/claims.json')
+          if claims_file.exists():
+              with open(claims_file) as f:
+                  data = json.load(f)
+              
+              claims = data.get('claims', [])
+              active_exclusive_claims = [c for c in claims if c.get('status') == 'active' and c.get('mode') == 'exclusive']
+              
+              collisions = []
+              for i, claim_a in enumerate(active_exclusive_claims):
+                  for claim_b in active_exclusive_claims[i+1:]:
+                      if claim_a['agent_id'] != claim_b['agent_id']:
+                          # Check for path overlaps
+                          paths_a = set(claim_a.get('paths', []))
+                          paths_b = set(claim_b.get('paths', []))
+                          
+                          # Simple overlap check (could be more sophisticated with glob matching)
+                          if paths_a & paths_b:
+                              collisions.append({
+                                  'claim_a': claim_a['id'],
+                                  'agent_a': claim_a['agent_id'],
+                                  'claim_b': claim_b['id'],
+                                  'agent_b': claim_b['agent_id'],
+                                  'overlap': list(paths_a & paths_b)
+                              })
+              
+              if collisions:
+                  print("⚠ Warning: Claim overlaps detected (advisory)")
+                  for collision in collisions:
+                      print(f"  {collision['claim_a']} ({collision['agent_a']}) overlaps with {collision['claim_b']} ({collision['agent_b']})")
+                      print(f"    Paths: {collision['overlap']}")
+              else:
+                  print("✓ No active exclusive claim overlaps detected")
+          EOF
+          
+          echo ""
+          echo "=== Alignment Check Passed ==="
+      
+      - name: Update supervisor state
+        if: success()
+        run: |
+          python3 << 'EOF'
+          import json
+          from datetime import datetime
+          
+          supervisor_state = {
+              "mode": "advisory",
+              "enabled": True,
+              "last_alignment_check": datetime.utcnow().isoformat() + "Z",
+              "alignment_status": "passed",
+              "pending_reviews": [],
+              "blocked_merges": []
+          }
+          
+          with open('.achords/supervisor/state.json', 'w') as f:
+              json.dump(supervisor_state, f, indent=2)
+          
+          print("✓ Supervisor state updated")
+          EOF
+      
+      - name: Comment PR result
+        if: always()
+        uses: actions/github-script@v6
+        with:
+          script: |
+            const status = '${{ steps.alignment.outcome }}';
+            if (status === 'success') {
+              github.rest.issues.createComment({
+                issue_number: context.issue.number,
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                body: '✓ **Achords Alignment Check Passed**\n\nAll protocol validations passed:\n- Required files present\n- JSON syntax valid\n- No blocking claim overlaps\n\nMerge is allowed.'
+              });
+            } else {
+              github.rest.issues.createComment({
+                issue_number: context.issue.number,
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                body: '✗ **Achords Alignment Check Failed**\n\nPlease fix the issues above:\n1. Ensure all required files exist\n2. Fix JSON syntax errors\n3. Resolve claim overlaps\n\nSee logs above for details.'
+              });
+            }

@@ -1,0 +1,9 @@
+{
+  "team_structure": {
+    "mode": "multi-agent",
+    "supervisor_enabled": true
+  },
+  "collaboration_model": "claim-based-coordination",
+  "policy_enforcement": "CI-gated",
+  "last_updated": "2026-07-04T00:00:00Z"
+}
