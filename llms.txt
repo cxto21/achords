@@ -1,0 +1,41 @@
+# Achords
+
+> A lightweight protocol for multi-agent software collaboration.
+
+Achords is a multi-agent orchestration protocol designed for software development teams. It provides tools for organization-level resource management, repository coordination, AI-powered code review, and knowledge base documentation.
+
+## Status
+
+**Everything is in development.** No product is production-ready. This is an experimental protocol exploring how AI agents can collaborate on software projects.
+
+## Products
+
+### Organization Base (obase)
+- Manages GitHub organization-level resources
+- Policies, schemas, and topology configuration
+- Available as CLI: `npx achords obase`
+
+### Repository Coordination (rcord)
+- Multi-agent coordination within repositories
+- Work distribution and conflict resolution
+- **Status: In development**
+
+### IA on CI (iaci)
+- AI-powered code review in CI/CD pipelines
+- Automated business logic validation
+- **Status: In development**
+
+### KB Web (kbweb)
+- Living documentation that evolves with code
+- Powered by Quartz v5
+- **Status: In development**
+
+## Protocol
+
+Achords uses a shared memory system (`.engram`) and skill-based architecture where each agent loads specialized instructions for their task.
+
+## Links
+
+- GitHub: https://github.com/cxto21/achords
+- npm: https://www.npmjs.com/package/achords
+- License: MIT

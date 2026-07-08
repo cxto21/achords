@@ -1,10 +1,38 @@
 {
   "name": "achords",
-  "version": "1.0.0",
-  "private": true,
+  "version": "0.1.0",
+  "description": "Multi-agent orchestration protocol for software development",
+  "bin": {
+    "achords": "./bin/achords"
+  },
+  "files": [
+    "bin/",
+    "llms.txt",
+    "README.md",
+    "LICENSE"
+  ],
   "scripts": {
     "build": "cd web && npm install && npm run build",
     "dev": "cd web && npm install && npm run dev",
     "preview": "cd web && npm run preview"
-  }
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/cxto21/achords.git"
+  },
+  "keywords": [
+    "multi-agent",
+    "orchestration",
+    "protocol",
+    "ai",
+    "cicd",
+    "github",
+    "collaboration"
+  ],
+  "author": "Poincare Space",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/cxto21/achords/issues"
+  },
+  "homepage": "https://achords.pages.dev"
 }
