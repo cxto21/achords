@@ -17,7 +17,7 @@ export const translations = {
     hero: {
       title1: "LA ARMONÍA",
       title2: "DE LA IA.",
-      subtitle: "Diseñado para equipos de desarrollo que migran a sistemas de agentes. Orquestación de precisión para transformar flujos de trabajo en sinfonías automatizadas de código.",
+      subtitle: "Configurá el desarrollo multi-agente en tu equipo en minutos. Un solo comando para inicializar políticas, schemas y reglas de coordinación entre agentes.",
       starGitHub: "Star on GitHub",
       docs: "Documentación",
       terminal: "Terminal",
@@ -111,7 +111,7 @@ export const translations = {
     hero: {
       title1: "THE HARMONY",
       title2: "OF AI.",
-      subtitle: "Designed for development teams migrating to agent systems. Precision orchestration to transform workflows into automated code symphonies.",
+      subtitle: "Set up multi-agent development for your team in minutes. One command to initialize policies, schemas, and coordination rules between agents.",
       starGitHub: "Star on GitHub",
       docs: "Documentation",
       terminal: "Terminal",
