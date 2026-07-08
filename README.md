@@ -1,95 +1,66 @@
 # Achords
 
-**Achords (Agent Chords)** is a lightweight, repository-native protocol for multi-agent software collaboration.
+**Agent Chords** — A lightweight protocol for multi-agent software collaboration.
 
----
+## What It Does
 
-## Mandatory for all agents
+When multiple AI agents work on the same codebase, you need coordination. Achords provides:
 
-Before doing any work in this repository, **read**:
+- **Claims** — Agents declare intent before editing
+- **Collision detection** — CI blocks conflicting changes
+- **Audit trail** — Every action is logged
+- **Repo-native** — All state lives in Git
 
-- [`AGENTS.md`](./AGENTS.md)
-
----
-
-## Quick start
-
-### Developer setup
+## Quick Start
 
 ```bash
+# Clone
+git clone https://github.com/your-org/achords.git
+cd achords
+
+# Configure
+cp .env.example .env
+
+# Setup
 bash scripts/dev-setup.sh
 ```
-
-Adds `.engram` shared memory to this project.
-
-### Organization owners
-
-```bash
-# Basic bootstrap
-bash .achords/skills/platform/org-bootstrap/scripts/bootstrap.sh <org-name>
-
-# With team skills from external repo
-bash .achords/skills/platform/org-bootstrap/scripts/bootstrap.sh <org-name> <skills-repo-url>
-```
-
-The skills repo URL is optional. If provided, it clones into `.skills/` automatically.
-
-### Team members
-
-```bash
-bash .achords/skills/platform/org-join/scripts/setup.sh <org-name>
-```
-
----
 
 ## Structure
 
 ```
-.
-├── AGENTS.md
-├── README.md
-├── .engram/                  # Shared memory (submodule)
-├── .achords/
-│   ├── skills/
-│   │   ├── platform/
-│   │   │   ├── org-bootstrap/
-│   │   │   └── org-join/
-│   │   ├── achords-init/
-│   │   ├── agent-union/
-│   │   ├── claim-declaration/
-│   │   ├── claim-collision-check/
-│   │   └── alignment-verify/
-│   ├── registry.json
-│   ├── claims.json
-│   └── events.ndjson
-├── scripts/
-│   └── dev-setup.sh          # Add .engram submodule
-└── .github/
-    └── workflows/
+achords/
+├── docs/              # Documentation
+│   ├── protocol.md    # What Achords is
+│   ├── architecture.md # Three-level design
+│   ├── collaboration.md # Async/sync modes
+│   └── roadmap.md     # Status and plans
+├── templates/         # Files copied to projects
+│   ├── skills/        # Protocol skills
+│   ├── schemas/       # JSON schemas
+│   └── workflows/     # CI workflows
+├── protocol/          # Specification
+├── scripts/           # Setup scripts
+└── .env.example       # Configuration template
 ```
 
----
+## Documentation
 
-## Skills
+| Document | Purpose |
+|----------|---------|
+| [Protocol](./docs/protocol.md) | What Achords is and why |
+| [Architecture](./docs/architecture.md) | Three-level design |
+| [Collaboration](./docs/collaboration.md) | Async, sync, repo modes |
+| [Getting Started](./docs/getting-started.md) | Set up your project |
+| [Roadmap](./docs/roadmap.md) | What's ready, what's coming |
 
-| Skill | Purpose |
-|-------|---------|
-| `org-bootstrap` | Create GitHub org structure |
-| `org-join` | Team member onboarding |
-| `achords-init` | Bootstrap protocol in repo |
-| `agent-union` | Register agent |
-| `claim-declaration` | Declare work intent |
-| `claim-collision-check` | Detect overlapping claims |
-| `alignment-verify` | CI validation |
+## Status
 
----
+See [Roadmap](./docs/roadmap.md) for current status.
 
-## Docs
+**Ready**: Platform setup, documentation  
+**In Progress**: Org bootstrap refinement  
+**Planned**: Repository-level skills, claims, CI
 
-- [`AGENTS.md`](./AGENTS.md) — Agent rules
-- [`.achords/ACHORDS.md`](./.achords/ACHORDS.md) — Protocol spec
-- [`.achords/skills/`](./.achords/skills/README.md) — Skills
+## License
 
----
-
-*Lightweight. Repo-native. Extensible.*
+MIT
