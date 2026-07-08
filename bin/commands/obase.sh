@@ -53,6 +53,7 @@ show_help() {
   echo "    --org <name>          Organization name"
   echo "    --skills <url>        Skills repository URL"
   echo "    --dir <path>          Work directory (default: ~/achords-workspace)"
+  echo "    --repo <name>         Setup existing repo for agent memory"
   echo "    --update-profile      Update repos table in profile README only"
   echo "    --push                Commit and push changes after update"
   echo "    --help, -h            Show this help"
@@ -61,6 +62,7 @@ show_help() {
   echo "    achords obase"
   echo "    achords obase --org MyOrg"
   echo "    achords obase --org MyOrg --skills https://github.com/org/skills.git"
+  echo "    achords obase --repo my-project"
   echo "    achords obase --update-profile"
   echo "    achords obase --update-profile --push"
   echo ""
@@ -73,6 +75,7 @@ parse_args() {
   WORK_DIR="${HOME}/achords-workspace"
   UPDATE_PROFILE=false
   AUTO_PUSH=false
+  REPO_NAME=""
   
   while [ $# -gt 0 ]; do
     case "$1" in
@@ -86,6 +89,10 @@ parse_args() {
         ;;
       --dir)
         WORK_DIR="$2"
+        shift 2
+        ;;
+      --repo)
+        REPO_NAME="$2"
         shift 2
         ;;
       --update-profile)
@@ -342,6 +349,7 @@ init_achords_repo() {
   mkdir -p skills
   mkdir -p agents
   mkdir -p templates
+  mkdir -p .engram/chunks
   
   # Create version.json
   cat > version.json << 'EOF'
@@ -351,7 +359,13 @@ init_achords_repo() {
   "created_at": "TIMESTAMP",
   "updated_at": "TIMESTAMP",
   "description": "Achords organization configuration",
-  "owner": "ORG_NAME"
+  "owner": "ORG_NAME",
+  "components": {
+    "engram": "1.0.0",
+    "agents": "1.0.0",
+    "skills": "1.0.0",
+    "config": "1.0.0"
+  }
 }
 EOF
   sed -i "s/TIMESTAMP/$(date -u +%Y-%m-%dT%H:%M:%SZ)/g" version.json
@@ -375,12 +389,23 @@ EOF
 | Path | Purpose |
 |------|---------|
 | `version.json` | Current version and metadata |
+| `.engram/` | Shared org memory (git-synced) |
+| `.engram/manifest.json` | Index of shared chunks |
+| `.engram/chunks/` | Shared memory chunks |
 | `config/` | Organization-wide policies and schemas |
 | `config/policies.json` | Access and collaboration policies |
 | `config/schemas/` | Data schemas for agent communication |
 | `skills/` | Shared skills across all repos |
 | `agents/` | Agent-specific configurations |
 | `templates/` | Templates for new repos and agents |
+
+## Memory Sharing
+
+Org-wide memory is stored in `.engram/` and synced via git.
+Agents can load org knowledge using:
+```bash
+mem_search(project: "ORG_NAME", query: "conventions", limit: 5)
+```
 
 ## Versioning
 
@@ -426,9 +451,15 @@ EOF
     "allowed_models": ["gpt-4", "claude-3-opus"],
     "require_review": true,
     "max_changes_per_pr": 500
+  },
+  "memory": {
+    "org_level": "ORG_NAME",
+    "sync_enabled": true,
+    "retention_days": 365
   }
 }
 EOF
+  sed -i "s/\"ORG_NAME\"/\"${ORG_NAME}\"/g" config/policies.json
   
   # Create empty schemas directory marker
   cat > config/schemas/README.md << 'EOF'
@@ -458,9 +489,32 @@ EOF
 Templates for new repositories and agent configurations.
 EOF
   
+  # Create .gitignore for .engram
+  cat > .gitignore << 'EOF'
+# Engram local database (synced via manifest.json + chunks)
+.engram/engram.db
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Node modules (if any)
+node_modules/
+
+# Environment files
+.env
+.env.local
+EOF
+  
   # Commit
   git add -A
-  git commit -m "init: achords configuration structure" --quiet
+  git commit -m "init: achords configuration structure with .engram" --quiet
   
   ok ".achords initialized"
 }
@@ -739,6 +793,111 @@ import_skills() {
   fi
 }
 
+# ── setup repo for agent memory ──────────────────────────────────────
+setup_repo_memory() {
+  local repo_dir="$1"
+  local repo_name="$2"
+  
+  if [ ! -d "$repo_dir" ]; then
+    return 1
+  fi
+  
+  cd "$repo_dir"
+  
+  # Create .engram directory and config.json
+  mkdir -p .engram
+  
+  cat > .engram/config.json << EOF
+{
+  "project_name": "${repo_name}",
+  "scope": "repo",
+  "org_level": "${ORG_NAME}",
+  "created_at": "$(date -u +%Y-%m-%dT%H:%M:%SZ)"
+}
+EOF
+  
+  # Add .achords submodule if not already added
+  if [ ! -f ".gitmodules" ] || ! grep -q ".achords" ".gitmodules" 2>/dev/null; then
+    # Check if .achords directory exists in work dir
+    if [ -d "${WORK_DIR}/.achords" ]; then
+      info "Adding .achords submodule to ${repo_name}..."
+      git submodule add "https://github.com/${ORG_NAME}/.achords.git" .achords 2>/dev/null || true
+    fi
+  fi
+  
+  # Create AGENTS.md if not exists
+  if [ ! -f "AGENTS.md" ]; then
+    cat > AGENTS.md << EOF
+# ${repo_name}
+
+> Agent configuration for this repository.
+
+## Organization Rules
+
+Read \`.achords/AGENTS.md\` for organization-wide agent rules.
+
+## Repository-Specific Rules
+
+Add your repo-specific rules here.
+
+## Memory
+
+This repository uses engram for persistent agent memory.
+
+- **Repo memory**: Stored in \`.engram/\` with project name \`${repo_name}\`
+- **Org memory**: Available via \`.achords/.engram/\` submodule
+
+### Loading Org Knowledge
+\`\`\`bash
+mem_search(project: "${ORG_NAME}", query: "conventions", limit: 5)
+\`\`\`
+
+### Saving Repo Memory
+\`\`\`bash
+mem_save(project: "${repo_name}", title: "Decision made", type: "decision", ...)
+\`\`\`
+EOF
+    git add AGENTS.md 2>/dev/null || true
+  fi
+  
+  # Add .engram to .gitignore if not already there
+  if [ ! -f ".gitignore" ]; then
+    cat > .gitignore << 'EOF'
+# Engram local database
+.engram/engram.db
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Node modules (if any)
+node_modules/
+
+# Environment files
+.env
+.env.local
+EOF
+    git add .gitignore 2>/dev/null || true
+  elif ! grep -q "\.engram/engram.db" ".gitignore" 2>/dev/null; then
+    echo -e "\n# Engram local database\n.engram/engram.db" >> .gitignore
+    git add .gitignore 2>/dev/null || true
+  fi
+  
+  # Commit changes if any
+  if [ -n "$(git status --porcelain 2>/dev/null)" ]; then
+    git add -A 2>/dev/null || true
+    git commit -m "feat: add agent memory configuration with .achords submodule" --quiet 2>/dev/null || true
+  fi
+  
+  return 0
+}
+
 # ── summary ──────────────────────────────────────────────────────────
 summary() {
   echo ""
@@ -750,8 +909,18 @@ summary() {
   echo ""
   echo "    ${WORK_DIR}/"
   echo "    ├── .github/     → Organization profile"
+  echo "    ├── .achords/    → Agent orchestration rules & shared memory"
+  echo "    │   └── .engram/ → Org-level memory (git-synced)"
   echo "    ├── .internal/   → Team docs & onboarding"
   echo "    └── .skills/     → Shared skills library"
+  echo ""
+  echo "  For new repositories, run:"
+  echo "    achords obase --repo <repo-name>"
+  echo ""
+  echo "  This will:"
+  echo "    • Create .engram/config.json with repo project name"
+  echo "    • Add .achords submodule for org rules"
+  echo "    • Create AGENTS.md with memory instructions"
   echo ""
   echo "  Next steps:"
   echo "    1. Edit ${WORK_DIR}/.github/profile/README.md"
@@ -771,6 +940,39 @@ main() {
   
   echo "$BANNER"
   echo ""
+  
+  # Handle --repo mode
+  if [ -n "$REPO_NAME" ]; then
+    # Load .env to get ORG_NAME
+    load_env
+    
+    # Validate we have an org name
+    if [ -z "$ORG_NAME" ]; then
+      err "No organization name found."
+      echo "  Run: achords obase --org <name> --repo <repo-name>"
+      exit 1
+    fi
+    
+    # Check if repo directory exists
+    local repo_dir="${WORK_DIR}/${REPO_NAME}"
+    if [ ! -d "$repo_dir" ]; then
+      err "Repository directory not found: ${repo_dir}"
+      echo "  Clone the repository first, then run:"
+      echo "    achords obase --repo ${REPO_NAME}"
+      exit 1
+    fi
+    
+    header "Setting up agent memory for ${REPO_NAME}"
+    setup_repo_memory "$repo_dir" "$REPO_NAME"
+    ok "Repository ${REPO_NAME} configured for agent memory"
+    echo ""
+    echo "  Next steps:"
+    echo "    1. Commit the changes to ${REPO_NAME}"
+    echo "    2. Start your agent in the repository"
+    echo "    3. Agent will load org knowledge from .achords/.engram/"
+    echo ""
+    return
+  fi
   
   # Handle --update-profile mode
   if [ "$UPDATE_PROFILE" = true ]; then
