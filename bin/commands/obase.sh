@@ -210,7 +210,8 @@ check_auth() {
 check_org() {
   header "Checking organization"
   
-  if gh org view "$ORG_NAME" > /dev/null 2>&1; then
+  # Use API directly - more reliable than gh org view for newly created orgs
+  if gh api "orgs/${ORG_NAME}" > /dev/null 2>&1; then
     ok "Organization '${ORG_NAME}' exists"
   else
     err "Organization '${ORG_NAME}' does not exist."
