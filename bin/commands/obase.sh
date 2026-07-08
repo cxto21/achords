@@ -275,17 +275,23 @@ check_local() {
 create_repos() {
   header "Creating repositories"
   
-  for repo in .github .internal .skills; do
+  for repo in .github .internal .skills .achords; do
     if gh repo view "${ORG_NAME}/${repo}" > /dev/null 2>&1; then
       ok "${repo} already exists"
     else
       local visibility="private"
       local desc="Internal team documentation"
       
-      if [ "$repo" = ".github" ]; then
-        visibility="public"
-        desc="GitHub organization profile"
-      fi
+      case "$repo" in
+        .github)
+          visibility="public"
+          desc="GitHub organization profile"
+          ;;
+        .achords)
+          visibility="private"
+          desc="Agent orchestration rules and versioned configuration"
+          ;;
+      esac
       
       info "Creating ${repo} (${visibility})..."
       gh repo create "${ORG_NAME}/${repo}" --"${visibility}" --description "$desc"
@@ -312,6 +318,153 @@ clone_repos() {
   done
 }
 
+# ── initialize .achords repo structure ──────────────────────────────
+init_achords_repo() {
+  header "Initializing .achords repo structure"
+  
+  local achords_dir="${WORK_DIR}/.achords"
+  
+  if [ ! -d "$achords_dir/.git" ]; then
+    err "Not a git repository: ${achords_dir}"
+    return 1
+  fi
+  
+  cd "$achords_dir"
+  
+  # Check if already initialized
+  if [ -f "version.json" ]; then
+    ok ".achords already initialized"
+    return 0
+  fi
+  
+  # Create directory structure
+  mkdir -p config/schemas
+  mkdir -p skills
+  mkdir -p agents
+  mkdir -p templates
+  
+  # Create version.json
+  cat > version.json << 'EOF'
+{
+  "version": "1.0.0",
+  "schema_version": "1.0.0",
+  "created_at": "TIMESTAMP",
+  "updated_at": "TIMESTAMP",
+  "description": "Achords organization configuration",
+  "owner": "ORG_NAME"
+}
+EOF
+  sed -i "s/TIMESTAMP/$(date -u +%Y-%m-%dT%H:%M:%SZ)/g" version.json
+  sed -i "s/\"ORG_NAME\"/\"${ORG_NAME}\"/g" version.json
+  
+  # Create AGENTS.md - the main entry point for agents
+  cat > AGENTS.md << 'EOF'
+# .achords — Agent Orchestration Rules
+
+> This file defines how AI agents work within this organization.
+> Each repo's AGENTS.md should reference this file.
+
+## How to Use
+
+1. Each repository has an `AGENTS.md` in its root
+2. That file tells agents to read `.achords/AGENTS.md` for org-wide rules
+3. Repo-specific rules stay in the repo's own `AGENTS.md`
+
+## Structure
+
+| Path | Purpose |
+|------|---------|
+| `version.json` | Current version and metadata |
+| `config/` | Organization-wide policies and schemas |
+| `config/policies.json` | Access and collaboration policies |
+| `config/schemas/` | Data schemas for agent communication |
+| `skills/` | Shared skills across all repos |
+| `agents/` | Agent-specific configurations |
+| `templates/` | Templates for new repos and agents |
+
+## Versioning
+
+When the organization updates agent rules:
+1. Update files in this repo
+2. Bump version in `version.json`
+3. All repos pull the latest via submodule update
+
+## Getting Started
+
+For repository owners:
+```bash
+# Add .achords as submodule
+git submodule add https://github.com/ORG/.achords.git .achords
+
+# Create AGENTS.md in your repo root
+cat > AGENTS.md << 'AGENTS_EOF'
+# AGENTS.md
+
+> Agent configuration for this repository.
+
+## Organization Rules
+
+Read `.achords/AGENTS.md` for organization-wide agent rules.
+
+## Repository-Specific Rules
+
+Add your repo-specific rules here.
+AGENTS_EOF
+```
+EOF
+  
+  # Create default policies
+  cat > config/policies.json << 'EOF'
+{
+  "version": "1.0.0",
+  "access": {
+    "who_can_create_repos": ["admin", "member"],
+    "who_can_invite": ["admin"],
+    "default_repo_permission": "read"
+  },
+  "agents": {
+    "allowed_models": ["gpt-4", "claude-3-opus"],
+    "require_review": true,
+    "max_changes_per_pr": 500
+  }
+}
+EOF
+  
+  # Create empty schemas directory marker
+  cat > config/schemas/README.md << 'EOF'
+# Schemas
+
+Data schemas for agent communication and data exchange.
+EOF
+  
+  # Create skills README
+  cat > skills/README.md << 'EOF'
+# Skills
+
+Shared skills across all repositories in this organization.
+EOF
+  
+  # Create agents README
+  cat > agents/README.md << 'EOF'
+# Agents
+
+Agent-specific configurations and profiles.
+EOF
+  
+  # Create templates README
+  cat > templates/README.md << 'EOF'
+# Templates
+
+Templates for new repositories and agent configurations.
+EOF
+  
+  # Commit
+  git add -A
+  git commit -m "init: achords configuration structure" --quiet
+  
+  ok ".achords initialized"
+}
+
 # ── generate base files ──────────────────────────────────────────────
 generate_files() {
   header "Generating base files"
@@ -329,6 +482,9 @@ generate_files() {
   
   # Add .github (public - org profile)
   repos_table+="| \`.github\` | Organization profile |"
+  
+  # Add .achords (private - agent rules)
+  repos_table+=$'\n'"| \`.achords\` | Agent orchestration rules |"
   
   # Add existing public repos from the organization (excluding achords-managed private repos)
   if [ "$repos_json" != "[]" ] && [ -n "$repos_json" ]; then
@@ -645,6 +801,7 @@ main() {
   check_local
   create_repos
   clone_repos
+  init_achords_repo
   generate_files
   import_skills
   summary
