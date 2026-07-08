@@ -17,6 +17,13 @@ ok()    { printf "\033[1;32m%s\033[0m %s\n" "OK" "$*"; }
 warn()  { printf "\033[1;33m%s\033[0m %s\n" "WARN" "$*"; }
 err()   { printf "\033[1;31m%s\033[0m %s\n" "ERR" "$*" >&2; }
 
+# ── load .env ────────────────────────────────────────────────────────
+if [ -f ".env" ]; then
+  set -a
+  source .env
+  set +a
+fi
+
 # ── config ───────────────────────────────────────────────────────────
 if [ $# -lt 1 ]; then
   echo "Usage: bash bootstrap.sh <org-name> [skills-repo-url]"
