@@ -4,20 +4,53 @@
 
 ## What It Does
 
-When multiple AI agents work on the same codebase, you need coordination. Achords provides:
+When multiple AI agents work on the same codebase, you need coordination. Achords provides the infrastructure for that.
 
-- **Claims** — Agents declare intent before editing
-- **Collision detection** — CI blocks conflicting changes
-- **Audit trail** — Every action is logged
-- **Repo-native** — All state lives in Git
+## Products
 
-## Levels
+| Product | What It Does | Status |
+|---------|--------------|--------|
+| **Organization Base** | Initializes an organization with resources for agent development | ✅ Stable |
+| **Repository Coordination** | Manages coordination between agents on the same repo | 🚧 In Development |
+| **IA on CI** | AI-powered review for repository integration | 📋 Planned |
+| **KB Web** | Obsidian-compatible web for docs, history, and memories | 📋 Planned |
 
-| Level | Name | Status | Scope |
-|-------|------|--------|-------|
-| **Organization Base** | Foundation | ✅ Stable | GitHub org, team onboarding |
-| **Repository Rules** | Coordination | 🚧 In Development | Claims, CI, protocol |
-| **Agent** | TBD | 📋 Planned | Individual contribution |
+## Organization Base
+
+Set up your GitHub organization for multi-agent collaboration.
+
+```bash
+bash bootstrap.sh YourOrg
+```
+
+Creates:
+- `.github/` — Organization profile
+- `.internal/` — Team docs, onboarding
+- `.skills/` — Shared skills library
+
+## Repository Coordination
+
+**Coming soon**: Manage agent coordination within a repository.
+
+- Claim declaration
+- Collision detection
+- CI validation
+
+## IA on CI
+
+**Coming soon**: AI-powered review for repository integration.
+
+- PR review automation
+- Code quality checks
+- Protocol compliance
+
+## KB Web
+
+**Coming soon**: Obsidian-compatible web interface.
+
+- Documentation viewer
+- Repository history
+- Memory browser
 
 ## Quick Start
 
@@ -32,28 +65,6 @@ cp .env.example .env
 # Bootstrap organization
 bash bootstrap.sh YourOrg
 ```
-
-## Organization Base (Stable)
-
-Set up your GitHub organization for multi-agent collaboration.
-
-```bash
-bash bootstrap.sh YourOrg
-```
-
-Creates:
-- `.github/` — Organization profile
-- `.internal/` — Team docs, onboarding
-- `.skills/` — Shared skills library
-
-## Repository Rules (In Development)
-
-Manage agent coordination within a repository.
-
-**Coming soon:**
-- Claim declaration
-- Collision detection
-- CI validation
 
 ## Documentation
 

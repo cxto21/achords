@@ -1,16 +1,12 @@
 # Roadmap
 
-Current status and planned features.
+Achords ecosystem — Products and their status.
 
-## Status Legend
+## Products
 
-| Status | Meaning |
-|--------|---------|
-| ✅ Stable | Fully implemented, tested, documented |
-| 🚧 In Development | Being built, not yet complete |
-| 📋 Planned | Designed but not yet implemented |
+### 1. Organization Base
 
-## Organization Base
+**What**: Initializes a GitHub organization configured with resources for agent-assisted development.
 
 **Status**: ✅ Stable  
 **Branch**: main
@@ -23,10 +19,22 @@ Current status and planned features.
 | Multi-org support | ✅ Stable | `.env` configuration |
 | Error handling | ✅ Stable | Pre-checks, conflict detection |
 
-## Repository Rules
+**What it creates:**
+```
+your-org/
+├── .github/          # Public profile
+├── .internal/        # Team docs, onboarding
+└── .skills/          # Shared skills library
+```
+
+---
+
+### 2. Repository Coordination
+
+**What**: Manages coordination between different agents working on the same repository.
 
 **Status**: 🚧 In Development  
-**Branch**: feat/repository-rules
+**Branch**: feat/repository-coordination
 
 | Feature | Status | Notes |
 |---------|--------|-------|
@@ -36,52 +44,89 @@ Current status and planned features.
 | `claim-collision-check` | 📋 Planned | Overlap detection |
 | `alignment-verify` | 📋 Planned | CI validation |
 
-## Agent
+**What it creates:**
+```
+your-repo/
+├── .achords/
+│   ├── registry.json       # Agent registry
+│   ├── claims.json         # Active claims
+│   ├── events.ndjson       # Audit log
+│   └── schemas/            # JSON schemas
+└── .github/workflows/
+    └── achords-*.yml       # CI workflows
+```
+
+---
+
+### 3. IA on CI
+
+**What**: Manages AI-powered review processes for repository integration.
 
 **Status**: 📋 Planned  
 **Branch**: TBD
 
 | Feature | Status | Notes |
 |---------|--------|-------|
-| Name and scope | 📋 Planned | Being defined |
-| Registration | 📋 Planned | — |
-| Claim lifecycle | 📋 Planned | — |
-| Inbox messaging | 📋 Planned | — |
-| State tracking | 📋 Planned | — |
+| PR review automation | 📋 Planned | — |
+| Code quality checks | 📋 Planned | — |
+| Protocol compliance | 📋 Planned | — |
+| Merge gating | 📋 Planned | — |
 
-## Documentation
-
-| Document | Status | Notes |
-|----------|--------|-------|
-| Protocol overview | ✅ Stable | `docs/protocol.md` |
-| Architecture | ✅ Stable | `docs/architecture.md` |
-| Collaboration modes | ✅ Stable | `docs/collaboration.md` |
-| Getting started | ✅ Stable | `docs/getting-started.md` |
-| Full specification | 🚧 In Development | `protocol/specification.md` |
-
-## Completed
-
-- [x] Repository restructure
-- [x] Organization Base implementation
-- [x] Documentation structure
-- [x] `.engram` integration
-- [x] `.env` configuration
-- [x] Error handling
-
-## In Development
-
-- [ ] Repository Rules implementation
-- [ ] achords-init script
-- [ ] Agent-level design
-
-## Planned
-
-- [ ] Agent registration system
-- [ ] Claims management
-- [ ] CI workflow templates
-- [ ] JSON schemas
-- [ ] Collision detection
+**What it will do:**
+- Review PRs against protocol rules
+- Check claim compliance
+- Validate code quality
+- Block or allow merges
 
 ---
 
-*Updated as features move from Planned → In Development → Stable.*
+### 4. KB Web
+
+**What**: Obsidian-compatible web interface for organization documentation, repository history, and memories.
+
+**Status**: 📋 Planned  
+**Branch**: TBD
+
+| Feature | Status | Notes |
+|---------|--------|-------|
+| Documentation viewer | 📋 Planned | — |
+| Repository history | 📋 Planned | — |
+| Memory browser | 📋 Planned | — |
+| Visual navigation | 📋 Planned | — |
+
+**What it will show:**
+- Organization documentation
+- Repository commit history
+- `.engram` memories (decisions, discoveries)
+- Visual graph of relationships
+
+---
+
+## Status Legend
+
+| Status | Meaning |
+|--------|---------|
+| ✅ Stable | Fully implemented, tested, documented |
+| 🚧 In Development | Being built, not yet complete |
+| 📋 Planned | Designed but not yet implemented |
+
+## Branch Strategy
+
+```
+main
+├── Organization Base (stable)
+└── Documentation
+
+feat/repository-coordination
+└── Repository Rules (in development)
+
+feat/ia-on-ci
+└── AI review (planned)
+
+feat/kb-web
+└── Knowledge base web (planned)
+```
+
+---
+
+*Updated as products move from Planned → In Development → Stable.*

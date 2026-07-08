@@ -1,38 +1,43 @@
 # Architecture
 
-Achords operates across three levels. Each level has a distinct scope and status.
+Achords is an ecosystem of products for multi-agent collaboration.
+
+## Products
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
 │  ORGANIZATION BASE                                          │
 │  Status: ✅ Stable                                          │
-│  Scope: GitHub org, team onboarding                         │
-│  Skills: org-bootstrap, org-join                            │
+│  What: Initializes organization with agent resources        │
 └─────────────────────────────────────────────────────────────┘
                             │
                             ▼
 ┌─────────────────────────────────────────────────────────────┐
-│  REPOSITORY RULES                                           │
+│  REPOSITORY COORDINATION                                    │
 │  Status: 🚧 In Development                                 │
-│  Scope: Single repo, claim management, CI                   │
-│  Skills: achords-init, agent-union, claims, alignment       │
+│  What: Manages agent coordination on same repo              │
 └─────────────────────────────────────────────────────────────┘
                             │
                             ▼
 ┌─────────────────────────────────────────────────────────────┐
-│  AGENT                                                      │
+│  IA ON CI                                                   │
 │  Status: 📋 Planned                                         │
-│  Scope: Individual agent, contribution workflow             │
-│  TBD: Name and scope still being defined                    │
+│  What: AI-powered review for repository integration         │
+└─────────────────────────────────────────────────────────────┘
+                            │
+                            ▼
+┌─────────────────────────────────────────────────────────────┐
+│  KB WEB                                                     │
+│  Status: 📋 Planned                                         │
+│  What: Obsidian-compatible web for docs and memories        │
 └─────────────────────────────────────────────────────────────┘
 ```
 
 ## Organization Base
 
-**Status**: ✅ Stable (main branch)  
-**Scope**: GitHub organization  
-**Owner**: Organization admin  
-**One-time**: Set up once per org
+**Status**: ✅ Stable  
+**Branch**: main  
+**What**: Initializes a GitHub organization configured with resources for agent-assisted development.
 
 | Skill | Purpose |
 |-------|---------|
@@ -48,12 +53,11 @@ your-org/
 └── .skills/          # Shared skills library
 ```
 
-## Repository Rules
+## Repository Coordination
 
-**Status**: 🚧 In Development (feature branch)  
-**Scope**: Single repository  
-**Owner**: Repository maintainers  
-**Per-repo**: Initialize once per repo
+**Status**: 🚧 In Development  
+**Branch**: feat/repository-coordination  
+**What**: Manages coordination between different agents working on the same repository.
 
 | Skill | Purpose |
 |-------|---------|
@@ -73,34 +77,34 @@ your-repo/
 │   ├── events.ndjson       # Audit log
 │   └── schemas/            # JSON schemas
 └── .github/workflows/
-    ├── achords-union.yml
-    └── achords-alignment-check.yml
+    └── achords-*.yml       # CI workflows
 ```
 
-## Agent
+## IA on CI
 
 **Status**: 📋 Planned  
-**Scope**: Individual agent  
-**Owner**: The agent itself  
-**Name**: TBD
+**Branch**: TBD  
+**What**: Manages AI-powered review processes for repository integration.
 
 ### Planned Features
 
-- Agent registration
-- Claim lifecycle
-- Inbox messaging
-- State tracking
+- PR review automation
+- Code quality checks
+- Protocol compliance
+- Merge gating
 
-## Branch Strategy
+## KB Web
 
-```
-main
-├── Organization Base (stable)
-└── Documentation
+**Status**: 📋 Planned  
+**Branch**: TBD  
+**What**: Obsidian-compatible web interface for organization documentation, repository history, and memories.
 
-feat/repository-rules
-└── Repository Rules (in development)
-```
+### Planned Features
+
+- Documentation viewer
+- Repository history
+- Memory browser
+- Visual navigation
 
 ---
 
