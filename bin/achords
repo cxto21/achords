@@ -10,7 +10,6 @@
 #   achords                    # List available products
 #   achords obase              # Organization Base setup
 #   achords obase --org MyOrg  # Setup with specific org
-#   achords rcord init         # Initialize Repository Coordination
 #
 # ══════════════════════════════════════════════════════════════════════
 
@@ -75,7 +74,6 @@ list_products() {
   printf "  ${BOLD}Examples:${NC}\n"
   echo "    achords obase              # Setup organization"
   echo "    achords obase --org MyOrg  # Setup with specific org"
-  echo "    achords rcord init         # Init repo coordination"
   echo ""
 }
 

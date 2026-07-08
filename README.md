@@ -18,7 +18,7 @@ cd achords
 | Product | Command | Description | Status |
 |---------|---------|-------------|--------|
 | [**Organization Base**](./docs/obase.md) | `achords obase` | Set up your GitHub org | ✅ Stable |
-| **Repository Coordination** | `achords rcord` | Claim-based agent coordination | 🚧 In Development |
+| **Repository Coordination** | — | Claim-based agent coordination | 🚧 In Development |
 | **IA on CI** | — | AI-powered review | 📋 Planned |
 | **KB Web** | — | Documentation web | 🚧 In Development |
 
@@ -33,7 +33,6 @@ cd achords
 
 # Run product
 ./bin/achords obase --org MyOrg
-./bin/achords rcord init
 ```
 
 ## How it works
