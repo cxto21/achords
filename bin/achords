@@ -1,0 +1,154 @@
+#!/usr/bin/env bash
+# ══════════════════════════════════════════════════════════════════════
+# achords — Multi-agent collaboration CLI
+# ══════════════════════════════════════════════════════════════════════
+# 
+# Usage:
+#   achords [product] [command] [options]
+#
+# Examples:
+#   achords                    # List available products
+#   achords obase              # Organization Base setup
+#   achords obase --org MyOrg  # Setup with specific org
+#   achords rcord init         # Initialize Repository Coordination
+#
+# ══════════════════════════════════════════════════════════════════════
+
+set -euo pipefail
+
+# ── config ───────────────────────────────────────────────────────────
+VERSION="1.0.0"
+ACHORDS_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+COMMANDS_DIR="${ACHORDS_DIR}/bin/commands"
+
+# ── branding ─────────────────────────────────────────────────────────
+BANNER=$(cat << 'EOF'
+  ╔═══════════════════════════════════════════╗
+  ║     🎵 A C H O R D S                     ║
+  ║     Multi-agent collaboration            ║
+  ╚═══════════════════════════════════════════╝
+EOF
+)
+
+# ── colors ───────────────────────────────────────────────────────────
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+YELLOW='\033[0;33m'
+BLUE='\033[0;34m'
+MAGENTA='\033[0;35m'
+CYAN='\033[0;36m'
+BOLD='\033[1m'
+NC='\033[0m'
+
+# ── helpers ──────────────────────────────────────────────────────────
+info()  { printf "${CYAN}▸${NC} %s\n" "$*"; }
+ok()    { printf "${GREEN}✓${NC} %s\n" "$*"; }
+warn()  { printf "${YELLOW}⚠${NC} %s\n" "$*"; }
+err()   { printf "${RED}✗${NC} %s\n" "$*" >&2; }
+
+# ── list products ────────────────────────────────────────────────────
+list_products() {
+  echo "$BANNER"
+  echo ""
+  printf "  ${BOLD}Version:${NC} %s\n" "$VERSION"
+  echo ""
+  printf "  ${BOLD}Available products:${NC}\n"
+  echo ""
+  
+  # Scan commands directory
+  if [ -d "$COMMANDS_DIR" ]; then
+    for cmd in "$COMMANDS_DIR"/*.sh; do
+      if [ -f "$cmd" ]; then
+        local name
+        name=$(basename "$cmd" .sh)
+        local desc
+        desc=$(grep -m1 "^# Description:" "$cmd" 2>/dev/null | sed 's/^# Description: //' || echo "No description")
+        printf "  ${MAGENTA}%-12s${NC} %s\n" "$name" "$desc"
+      fi
+    done
+  fi
+  
+  echo ""
+  printf "  ${BOLD}Usage:${NC}\n"
+  echo "    achords <product> [command] [options]"
+  echo ""
+  printf "  ${BOLD}Examples:${NC}\n"
+  echo "    achords obase              # Setup organization"
+  echo "    achords obase --org MyOrg  # Setup with specific org"
+  echo "    achords rcord init         # Init repo coordination"
+  echo ""
+}
+
+# ── show product help ────────────────────────────────────────────────
+show_product_help() {
+  local product="$1"
+  local cmd_file="${COMMANDS_DIR}/${product}.sh"
+  
+  if [ ! -f "$cmd_file" ]; then
+    err "Unknown product: ${product}"
+    echo ""
+    list_products
+    exit 1
+  fi
+  
+  # Show product banner and help
+  if grep -q "^show_help" "$cmd_file"; then
+    source "$cmd_file"
+    show_help
+  else
+    err "No help available for ${product}"
+    exit 1
+  fi
+}
+
+# ── run product command ──────────────────────────────────────────────
+run_product() {
+  local product="$1"
+  shift
+  local cmd_file="${COMMANDS_DIR}/${product}.sh"
+  
+  if [ ! -f "$cmd_file" ]; then
+    err "Unknown product: ${product}"
+    echo ""
+    list_products
+    exit 1
+  fi
+  
+  # Make executable and run
+  chmod +x "$cmd_file"
+  source "$cmd_file" "$@"
+}
+
+# ── main ─────────────────────────────────────────────────────────────
+main() {
+  # No args - show banner and products
+  if [ $# -eq 0 ]; then
+    list_products
+    exit 0
+  fi
+  
+  local product="$1"
+  shift
+  
+  # Check for help flags
+  if [ "$product" = "--help" ] || [ "$product" = "-h" ]; then
+    list_products
+    exit 0
+  fi
+  
+  if [ "$product" = "--version" ] || [ "$product" = "-v" ]; then
+    echo "achords ${VERSION}"
+    exit 0
+  fi
+  
+  # Check if it's a help request for a product
+  if [ $# -gt 0 ] && { [ "$1" = "--help" ] || [ "$1" = "-h" ]; }; then
+    show_product_help "$product"
+    exit 0
+  fi
+  
+  # Run the product
+  run_product "$product" "$@"
+}
+
+main "$@"

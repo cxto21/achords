@@ -2,15 +2,6 @@
 
 **Multi-agent collaboration protocol for software development.**
 
-## Products
-
-| Product | Command | Description | Status |
-|---------|---------|-------------|--------|
-| [**Organization Base**](./docs/obase.md) | `bash obase.sh` | Set up your GitHub org | ✅ Stable |
-| **Repository Coordination** | `bash rcord.sh` | Claim-based agent coordination | 🚧 In Development |
-| **IA on CI** | — | AI-powered review | 📋 Planned |
-| **KB Web** | — | Documentation web | 🚧 In Development |
-
 ## Quick start
 
 ```bash
@@ -19,7 +10,30 @@ git clone https://github.com/cxto21/achords.git
 cd achords
 
 # Set up your organization
-bash obase.sh YourOrg
+./bin/achords obase --org YourOrg
+```
+
+## Products
+
+| Product | Command | Description | Status |
+|---------|---------|-------------|--------|
+| [**Organization Base**](./docs/obase.md) | `achords obase` | Set up your GitHub org | ✅ Stable |
+| **Repository Coordination** | `achords rcord` | Claim-based agent coordination | 🚧 In Development |
+| **IA on CI** | — | AI-powered review | 📋 Planned |
+| **KB Web** | — | Documentation web | 🚧 In Development |
+
+## CLI Usage
+
+```bash
+# List available products
+./bin/achords
+
+# Show product help
+./bin/achords obase --help
+
+# Run product
+./bin/achords obase --org MyOrg
+./bin/achords rcord init
 ```
 
 ## How it works

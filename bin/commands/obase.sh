@@ -2,14 +2,19 @@
 # ══════════════════════════════════════════════════════════════════════
 # obase — Organization Base
 # ══════════════════════════════════════════════════════════════════════
-# Sets up your GitHub organization for multi-agent collaboration.
+# Description: Set up your GitHub organization for multi-agent collaboration
 #
 # Usage:
-#   bash obase.sh [org-name]
+#   achords obase [options]
+#   achords obase --org MyOrg
+#   achords obase --help
 #
-# Examples:
-#   bash obase.sh
-#   bash obase.sh MyOrg
+# Options:
+#   --org <name>      Organization name
+#   --skills <url>    Skills repository URL
+#   --dir <path>      Work directory (default: ~/Poincare)
+#   --help, -h        Show this help
+#
 # ══════════════════════════════════════════════════════════════════════
 
 set -euo pipefail
@@ -33,37 +38,106 @@ warn()  { printf "\033[1;33m⚠\033[0m %s\n" "$*"; }
 err()   { printf "\033[1;31m✗\033[0m %s\n" "$*" >&2; }
 header(){ printf "\n\033[1;35m── %s ──\033[0m\n" "$*"; }
 
-# ── load .env ────────────────────────────────────────────────────────
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-ENV_FILE="${SCRIPT_DIR}/.env"
+# ── help ─────────────────────────────────────────────────────────────
+show_help() {
+  echo "$BANNER"
+  echo ""
+  printf "  \033[1m%s\033[0m — %s\n" "$PRODUCT" "$PRODUCT_NAME"
+  echo ""
+  echo "  Set up your GitHub organization for multi-agent collaboration."
+  echo ""
+  echo "  Usage:"
+  echo "    achords obase [options]"
+  echo ""
+  echo "  Options:"
+  echo "    --org <name>      Organization name"
+  echo "    --skills <url>    Skills repository URL"
+  echo "    --dir <path>      Work directory (default: ~/Poincare)"
+  echo "    --help, -h        Show this help"
+  echo ""
+  echo "  Examples:"
+  echo "    achords obase"
+  echo "    achords obase --org MyOrg"
+  echo "    achords obase --org MyOrg --skills https://github.com/org/skills.git"
+  echo ""
+}
 
+# ── parse args ───────────────────────────────────────────────────────
+parse_args() {
+  ORG_NAME=""
+  SKILLS_URL=""
+  WORK_DIR="${HOME}/Poincare"
+  
+  while [ $# -gt 0 ]; do
+    case "$1" in
+      --org)
+        ORG_NAME="$2"
+        shift 2
+        ;;
+      --skills)
+        SKILLS_URL="$2"
+        shift 2
+        ;;
+      --dir)
+        WORK_DIR="$2"
+        shift 2
+        ;;
+      --help|-h)
+        show_help
+        exit 0
+        ;;
+      *)
+        # Treat as org name for backwards compatibility
+        if [ -z "$ORG_NAME" ]; then
+          ORG_NAME="$1"
+        fi
+        shift
+        ;;
+    esac
+  done
+}
+
+# ── load .env ────────────────────────────────────────────────────────
 load_env() {
+  ENV_FILE="${WORK_DIR}/.env"
   if [ -f "$ENV_FILE" ]; then
     set -a
     source "$ENV_FILE"
     set +a
+    
+    # Use .env values as defaults
+    ORG_NAME="${ORG_NAME:-$ORG_NAME}"
+    SKILLS_URL="${SKILLS_REPO_URL:-$SKILLS_URL}"
+    WORK_DIR="${WORK_DIR:-$WORK_DIR}"
   fi
 }
 
 # ── create .env if missing ───────────────────────────────────────────
 setup_env() {
+  mkdir -p "$WORK_DIR"
+  ENV_FILE="${WORK_DIR}/.env"
+  
   if [ ! -f "$ENV_FILE" ]; then
     info "No .env found. Let's configure your organization."
     echo ""
     
     # Get org name from arg or prompt
-    if [ -n "${ORG_NAME:-}" ]; then
+    if [ -n "$ORG_NAME" ]; then
       READ_ORG="$ORG_NAME"
     else
       read -rp "  Organization name: " READ_ORG
     fi
     
     # Get optional skills repo
-    read -rp "  Skills repo URL (optional, press Enter to skip): " READ_SKILLS
+    if [ -n "$SKILLS_URL" ]; then
+      READ_SKILLS="$SKILLS_URL"
+    else
+      read -rp "  Skills repo URL (optional, press Enter to skip): " READ_SKILLS
+    fi
     
     # Get work directory
-    read -rp "  Work directory [${HOME}/Poincare]: " READ_WORKDIR
-    READ_WORKDIR="${READ_WORKDIR:-${HOME}/Poincare}"
+    read -rp "  Work directory [${WORK_DIR}]: " READ_WORKDIR
+    READ_WORKDIR="${READ_WORKDIR:-${WORK_DIR}}"
     
     # Write .env
     cat > "$ENV_FILE" << EOF
@@ -78,7 +152,11 @@ EOF
     
     ok ".env created"
     echo ""
-    load_env
+    
+    # Update variables
+    ORG_NAME="$READ_ORG"
+    WORK_DIR="$READ_WORKDIR"
+    SKILLS_URL="$READ_SKILLS"
   else
     load_env
   fi
@@ -135,7 +213,7 @@ check_org() {
     echo "  │                                                 │"
     echo "  │  https://github.com/organizations/new          │"
     echo "  │                                                 │"
-    echo "  │  Then re-run this script.                       │"
+    echo "  │  Then re-run this command.                      │"
     echo "  └─────────────────────────────────────────────────┘"
     echo ""
     exit 1
@@ -276,20 +354,20 @@ EOF
 
 # ── import skills if provided ────────────────────────────────────────
 import_skills() {
-  if [ -n "${SKILLS_REPO_URL:-}" ]; then
+  if [ -n "${SKILLS_URL:-}" ]; then
     header "Importing skills"
     
     local temp_dir
     temp_dir=$(mktemp -d)
     
-    if git clone "$SKILLS_REPO_URL" "$temp_dir" --quiet 2>/dev/null; then
+    if git clone "$SKILLS_URL" "$temp_dir" --quiet 2>/dev/null; then
       rm -rf "${WORK_DIR}/.skills"
       mv "$temp_dir" "${WORK_DIR}/.skills"
-      ok "Skills imported from ${SKILLS_REPO_URL}"
+      ok "Skills imported from ${SKILLS_URL}"
     else
       warn "Could not clone skills repo"
       echo "  Add it later:"
-      echo "    cd ${WORK_DIR}/.skills && git remote add origin ${SKILLS_REPO_URL}"
+      echo "    cd ${WORK_DIR}/.skills && git remote add origin ${SKILLS_URL}"
     fi
     
     rm -rf "$temp_dir"
@@ -319,20 +397,18 @@ summary() {
 
 # ── main ─────────────────────────────────────────────────────────────
 main() {
-  echo "$BANNER"
-  echo "  Version: ${VERSION}"
-  echo ""
+  parse_args "$@"
   
-  # Get org name from arg
-  if [ $# -ge 1 ]; then
-    ORG_NAME="$1"
+  # Skip banner if sourced by parent
+  if [ "${BASH_SOURCE[0]}" != "${0}" ]; then
+    return
   fi
+  
+  echo "$BANNER"
+  echo ""
   
   # Setup .env
   setup_env
-  
-  # Default work dir
-  WORK_DIR="${WORK_DIR:-${HOME}/Poincare}"
   
   # Run checks and setup
   check_deps
@@ -346,4 +422,7 @@ main() {
   summary
 }
 
-main "$@"
+# Run if executed directly
+if [ "${BASH_SOURCE[0]}" = "${0}" ]; then
+  main "$@"
+fi
