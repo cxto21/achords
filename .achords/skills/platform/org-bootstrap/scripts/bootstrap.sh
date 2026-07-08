@@ -57,6 +57,25 @@ fi
 ok "Dependencies OK"
 echo ""
 
+# ── check if organization exists ─────────────────────────────────────
+info "Checking organization..."
+
+if ! gh org view "$ORG" > /dev/null 2>&1; then
+  err "Organization '${ORG}' does not exist."
+  echo ""
+  echo "  Create it here:"
+  echo "    https://github.com/organizations/new"
+  echo ""
+  echo "  Or if you're using a personal account:"
+  echo "    https://github.com/account/repositories/new"
+  echo ""
+  echo "  After creating, re-run this script."
+  exit 1
+fi
+
+ok "Organization exists"
+echo ""
+
 # ── pre-check: verify local state before doing anything ──────────────
 info "Checking local state..."
 
