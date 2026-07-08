@@ -25,10 +25,12 @@ export const translations = {
     },
     // Products
     products: {
+      title: "PRODUCTOS.",
+      subtitle: "Cuatro productos que componen el ecosistema Achords.",
       obase: {
         name: "Organization Base",
         desc: "Inicializa tu organización GitHub para desarrollo multi-agente.",
-        status: null, // null = available
+        status: "Disponible",
       },
       rcord: {
         name: "Repository Coordination",
@@ -110,10 +112,12 @@ export const translations = {
     },
     // Products
     products: {
+      title: "PRODUCTS.",
+      subtitle: "Four products that compose the Achords ecosystem.",
       obase: {
         name: "Organization Base",
         desc: "Initialize your GitHub organization for multi-agent development.",
-        status: null,
+        status: "Available",
       },
       rcord: {
         name: "Repository Coordination",

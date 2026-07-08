@@ -74,6 +74,7 @@
     <!-- ═══════════════════════════════════════════════════════════════ -->
     <section id="hero" class="relative min-h-screen flex flex-col px-[5vw] pb-24 overflow-hidden justify-center">
       <div class="absolute inset-0 z-0 pointer-events-none opacity-60">
+        <img alt="Abstract waves" class="w-full h-full object-cover grayscale mix-blend-screen" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDDhMtXoyImcYvVSnuVpbdUmCNn_ZS-A4eFBK4BJtJCQ770QN6RlonFm0CLWLmEyxyzpCjy0gGjEPmcw8hM1cL4Nf88EE8A3Y4kf-BCE-11B4SI_sg0Hg2d1i5mHV-Jlg9UWMjp11TrUVWA4LqxfRTvu2oW2ai2c3qXoAdtaMHQAaqWLCEREMtI_Moi8JErWcGHyKqn_YaNeFqAsslvZ1hCy_LHRl9fhWngyk7L8yDqqwC0kLIltA1qvw">
         <div class="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent"></div>
         <div class="absolute inset-0 bg-gradient-to-br from-cyan-500/10 via-purple-500/5 to-pink-500/10 mix-blend-color"></div>
       </div>
@@ -123,40 +124,83 @@
     <div class="w-full h-48 flex items-end justify-center gap-[2px] px-[5vw] opacity-30 overflow-hidden bg-black" id="waveform-top"></div>
 
     <!-- ═══════════════════════════════════════════════════════════════ -->
-    <!-- Features Grid -->
+    <!-- Products Section -->
     <!-- ═══════════════════════════════════════════════════════════════ -->
-    <section id="features" class="px-[5vw] py-40 border-t border-[#27272a] bg-black relative">
+    <section id="products" class="px-[5vw] py-32 border-t border-[#27272a] bg-black relative">
       <div class="flex flex-col mb-16">
-        <h2 class="text-7xl md:text-9xl font-black tracking-tighter mb-8" data-i18n="features.title">FEATURES.</h2>
-        <p class="w-full text-zinc-500 font-medium leading-relaxed text-xl max-w-4xl" data-i18n="features.subtitle">
-          Ocho características fundamentales para la orquestación técnica de tu ecosistema de agentes.
+        <h2 class="text-5xl md:text-7xl font-black tracking-tighter mb-6" data-i18n="products.title">PRODUCTOS.</h2>
+        <p class="w-full text-zinc-500 font-medium leading-relaxed text-lg max-w-4xl" data-i18n="products.subtitle">
+          Cuatro productos que componen el ecosistema Achords.
         </p>
       </div>
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 monolith-border" id="features-grid">
-        <!-- Rendered by JS -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <!-- Organization Base -->
+        <a href="https://github.com/cxto21/achords" class="block p-8 border border-[#27272a] hover:border-white hover:bg-zinc-900/50 transition-all group">
+          <div class="flex items-center gap-4 mb-4">
+            <span class="text-zinc-700 font-black text-5xl group-hover:text-white transition-colors">01</span>
+            <div class="flex-1">
+              <h3 class="text-2xl font-bold uppercase">Organization Base</h3>
+              <span class="text-xs text-green-500 font-bold uppercase tracking-widest">Disponible</span>
+            </div>
+          </div>
+          <p class="text-zinc-400 leading-relaxed" data-i18n="products.obase.desc">Inicializa tu organización GitHub para desarrollo multi-agente.</p>
+        </a>
+        <!-- Repository Coordination -->
+        <div class="block p-8 border border-[#27272a] opacity-50">
+          <div class="flex items-center gap-4 mb-4">
+            <span class="text-zinc-700 font-black text-5xl">02</span>
+            <div class="flex-1">
+              <h3 class="text-2xl font-bold uppercase">Repository Coordination</h3>
+              <span class="text-xs text-zinc-500 font-bold uppercase tracking-widest" data-i18n="products.rcord.status">Próximamente</span>
+            </div>
+          </div>
+          <p class="text-zinc-500 leading-relaxed" data-i18n="products.rcord.desc">Coordinación basada en claims para agentes en el mismo repo.</p>
+        </div>
+        <!-- IA on CI -->
+        <div class="block p-8 border border-[#27272a] opacity-50">
+          <div class="flex items-center gap-4 mb-4">
+            <span class="text-zinc-700 font-black text-5xl">03</span>
+            <div class="flex-1">
+              <h3 class="text-2xl font-bold uppercase">IA on CI</h3>
+              <span class="text-xs text-zinc-500 font-bold uppercase tracking-widest" data-i18n="products.iaci.status">Próximamente</span>
+            </div>
+          </div>
+          <p class="text-zinc-500 leading-relaxed" data-i18n="products.iaci.desc">Revisiones automáticas de código con IA en CI/CD.</p>
+        </div>
+        <!-- KB Web -->
+        <div class="block p-8 border border-[#27272a] opacity-50">
+          <div class="flex items-center gap-4 mb-4">
+            <span class="text-zinc-700 font-black text-5xl">04</span>
+            <div class="flex-1">
+              <h3 class="text-2xl font-bold uppercase">KB Web</h3>
+              <span class="text-xs text-zinc-500 font-bold uppercase tracking-widest" data-i18n="products.kbweb.status">Próximamente</span>
+            </div>
+          </div>
+          <p class="text-zinc-500 leading-relaxed" data-i18n="products.kbweb.desc">Documentación viva compatible con Obsidian.</p>
+        </div>
       </div>
     </section>
 
     <!-- ═══════════════════════════════════════════════════════════════ -->
     <!-- Terminal / Code Aesthetics -->
     <!-- ═══════════════════════════════════════════════════════════════ -->
-    <section class="px-[5vw] py-40 bg-zinc-950 relative overflow-hidden">
+    <section class="px-[5vw] py-32 bg-zinc-950 relative overflow-hidden">
       <div class="grid grid-cols-1 lg:grid-cols-2 gap-24 items-center">
         <div>
-          <h2 class="text-6xl md:text-8xl font-black mb-12 tracking-tighter uppercase" data-i18n="terminal.title">Estética del código.</h2>
+          <h2 class="text-4xl md:text-6xl font-black mb-10 tracking-tighter uppercase" data-i18n="terminal.title">Estética del código.</h2>
           <div class="space-y-8">
             <div class="flex gap-6">
-              <span class="material-symbols-outlined text-4xl mt-1">terminal</span>
+              <span class="material-symbols-outlined text-3xl mt-1">terminal</span>
               <div>
-                <h4 class="text-2xl font-bold uppercase mb-2" data-i18n="terminal.feature1.title">Despliegue Instantáneo</h4>
-                <p class="text-xl text-zinc-400 font-light" data-i18n="terminal.feature1.desc">Integración nativa en terminal. Sin sobrecarga de configuración.</p>
+                <h4 class="text-xl font-bold uppercase mb-2" data-i18n="terminal.feature1.title">Despliegue Instantáneo</h4>
+                <p class="text-base text-zinc-400 font-light" data-i18n="terminal.feature1.desc">Integración nativa en terminal. Sin sobrecarga de configuración.</p>
               </div>
             </div>
             <div class="flex gap-6">
-              <span class="material-symbols-outlined text-4xl mt-1">security</span>
+              <span class="material-symbols-outlined text-3xl mt-1">security</span>
               <div>
-                <h4 class="text-2xl font-bold uppercase mb-2" data-i18n="terminal.feature2.title">Privacidad Cifrada</h4>
-                <p class="text-xl text-zinc-400 font-light" data-i18n="terminal.feature2.desc">Sincronización de conocimiento bajo protocolos de seguridad máxima.</p>
+                <h4 class="text-xl font-bold uppercase mb-2" data-i18n="terminal.feature2.title">Privacidad Cifrada</h4>
+                <p class="text-base text-zinc-400 font-light" data-i18n="terminal.feature2.desc">Sincronización de conocimiento bajo protocolos de seguridad máxima.</p>
               </div>
             </div>
           </div>
@@ -207,7 +251,7 @@
         <div class="space-y-4">
           <h5 class="text-xs font-black uppercase tracking-widest text-zinc-400" data-i18n="footer.product.title">Producto</h5>
           <ul class="space-y-2">
-            <li><a class="text-sm font-bold uppercase hover:text-zinc-400 transition-colors" href="#features" data-i18n="footer.product.items.0">Funciones</a></li>
+            <li><a class="text-sm font-bold uppercase hover:text-zinc-400 transition-colors" href="#products" data-i18n="footer.product.items.0">Funciones</a></li>
             <li><a class="text-sm font-bold uppercase hover:text-zinc-400 transition-colors" href="https://github.com/cxto21/achords" data-i18n="footer.product.items.1">Seguridad</a></li>
             <li><a class="text-sm font-bold uppercase hover:text-zinc-400 transition-colors" href="https://github.com/cxto21/achords/blob/main/docs/roadmap.md" data-i18n="footer.product.items.2">Roadmap</a></li>
           </ul>
@@ -256,32 +300,6 @@
     }
     generateWaveform('waveform-top')
     generateWaveform('waveform-bottom')
-
-    // Render features grid dynamically from i18n
-    function renderFeatures() {
-      const grid = document.getElementById('features-grid')
-      if (!grid) return
-      const { t } = window._achordsI18n || {}
-      // Fallback: read from ES translations directly
-      const items = [
-        { num: "01", title: "Bases de Organización", desc: "Gestión de recursos maestros y orquestación centralizada de activos digitales." },
-        { num: "02", title: "Coordinación Git", desc: "Sincronía multi-hilo para repositorios complejos con resolución de conflictos asistida." },
-        { num: "03", title: "IA en CI", desc: "Revisiones automáticas de código y validación de lógica de negocio en tiempo real." },
-        { num: "04", title: "KB Web", desc: "Documentación viva y dinámica que evoluciona con cada commit del equipo." },
-        { num: "05", title: "Documentación para Humanos y Agentes", desc: "Diseñada para ser consumida tanto por desarrolladores como por LLMs de última generación." },
-        { num: "06", title: "Self-hosted y Nube Opcional", desc: "Opciones de despliegue flexibles con control total on-premise o escalabilidad gestionada." },
-        { num: "07", title: "Memoria Organizacional y RBAC", desc: "Base de conocimientos sincronizada con políticas robustas de Control de Acceso Basado en Roles." },
-        { num: "08", title: "Skill Hub", desc: "Un mercado centralizado para habilidades de agentes, organizado por equipos y perfiles." },
-      ]
-      grid.innerHTML = items.map(f => `
-        <div class="p-12 border-b border-[#27272a] hover:bg-zinc-900/50 transition-colors group">
-          <span class="block text-zinc-700 font-bold mb-8 text-4xl group-hover:text-white transition-colors">${f.num}</span>
-          <h3 class="text-3xl font-bold uppercase mb-6 leading-none">${f.title}</h3>
-          <p class="text-zinc-500 leading-relaxed">${f.desc}</p>
-        </div>
-      `).join('')
-    }
-    renderFeatures()
   </script>
 
 </body>
