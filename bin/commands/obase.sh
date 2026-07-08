@@ -50,15 +50,17 @@ show_help() {
   echo "    achords obase [options]"
   echo ""
   echo "  Options:"
-  echo "    --org <name>      Organization name"
-  echo "    --skills <url>    Skills repository URL"
-  echo "    --dir <path>      Work directory (default: ~/achords-workspace)"
-  echo "    --help, -h        Show this help"
+  echo "    --org <name>          Organization name"
+  echo "    --skills <url>        Skills repository URL"
+  echo "    --dir <path>          Work directory (default: ~/achords-workspace)"
+  echo "    --update-profile      Update repos table in profile README only"
+  echo "    --help, -h            Show this help"
   echo ""
   echo "  Examples:"
   echo "    achords obase"
   echo "    achords obase --org MyOrg"
   echo "    achords obase --org MyOrg --skills https://github.com/org/skills.git"
+  echo "    achords obase --update-profile"
   echo ""
 }
 
@@ -67,6 +69,7 @@ parse_args() {
   ORG_NAME=""
   SKILLS_URL=""
   WORK_DIR="${HOME}/achords-workspace"
+  UPDATE_PROFILE=false
   
   while [ $# -gt 0 ]; do
     case "$1" in
@@ -81,6 +84,10 @@ parse_args() {
       --dir)
         WORK_DIR="$2"
         shift 2
+        ;;
+      --update-profile)
+        UPDATE_PROFILE=true
+        shift
         ;;
       --help|-h)
         show_help
@@ -330,7 +337,7 @@ generate_files() {
     fi
   fi
   
-  # Write profile README
+  # Write profile README with markers for the repos table
   cat > "${profile_dir}/README.md" << EOF
 # ${ORG_NAME}
 
@@ -338,9 +345,11 @@ generate_files() {
 
 ## Repositories
 
+<!-- achords:repos:start -->
 | Repo | Purpose |
 |------|---------|
 ${repos_table}
+<!-- achords:repos:end -->
 EOF
   ok "Profile README"
   
@@ -382,6 +391,66 @@ EOF
 *To be completed by the team.*
 EOF
   ok "Onboarding files"
+}
+
+# ── update profile README repos table ────────────────────────────────
+update_profile() {
+  header "Updating profile README"
+  
+  local profile_file="${WORK_DIR}/.github/profile/README.md"
+  
+  if [ ! -f "$profile_file" ]; then
+    err "Profile README not found at ${profile_file}"
+    echo "  Run: achords obase --org ${ORG_NAME}"
+    exit 1
+  fi
+  
+  # Check for markers
+  if ! grep -q "<!-- achords:repos:start -->" "$profile_file"; then
+    err "Profile README does not have repos markers."
+    echo "  Run: achords obase --org ${ORG_NAME} to regenerate."
+    exit 1
+  fi
+  
+  # Fetch public repos from the organization
+  local repos_json
+  repos_json=$(gh api "orgs/${ORG_NAME}/repos?type=public&per_page=100" --paginate 2>/dev/null || echo "[]")
+  
+  # Build repos table
+  local repos_table=""
+  
+  # Add .github (public - org profile)
+  repos_table+="| \`.github\` | Organization profile |"
+  
+  # Add existing public repos from the organization
+  if [ "$repos_json" != "[]" ] && [ -n "$repos_json" ]; then
+    local existing_repos
+    existing_repos=$(echo "$repos_json" | jq -r '.[] | select(.name != ".github" and .name != ".internal" and .name != ".skills") | "\(.name)|\(.description // "No description")"' 2>/dev/null)
+    
+    if [ -n "$existing_repos" ]; then
+      while IFS='|' read -r repo_name repo_desc; do
+        if [ -n "$repo_name" ]; then
+          repos_table+=$'\n'"| \`${repo_name}\` | ${repo_desc} |"
+        fi
+      done <<< "$existing_repos"
+    fi
+  fi
+  
+  # Replace content between markers using awk
+  awk -v table="<!-- achords:repos:start -->
+| Repo | Purpose |
+|------|---------|
+${repos_table}
+<!-- achords:repos:end -->" '
+    /<!-- achords:repos:start -->/ { print table; skip=1; next }
+    /<!-- achords:repos:end -->/ { skip=0; next }
+    !skip { print }
+  ' "$profile_file" > "${profile_file}.tmp" && mv "${profile_file}.tmp" "$profile_file"
+  
+  ok "Repos table updated"
+  echo ""
+  echo "  Updated repos in: ${profile_file}"
+  echo ""
 }
 
 # ── import skills if provided ────────────────────────────────────────
@@ -439,6 +508,25 @@ main() {
   echo "$BANNER"
   echo ""
   
+  # Handle --update-profile mode
+  if [ "$UPDATE_PROFILE" = true ]; then
+    # Load .env to get ORG_NAME
+    load_env
+    
+    # Validate we have an org name
+    if [ -z "$ORG_NAME" ]; then
+      err "No organization name found."
+      echo "  Run: achords obase --org <name> --update-profile"
+      exit 1
+    fi
+    
+    check_deps
+    check_auth
+    update_profile
+    return
+  fi
+  
+  # Full setup mode
   # Setup .env
   setup_env
   
