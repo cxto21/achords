@@ -1,17 +1,19 @@
 # Architecture
 
-Achords operates across three levels. Each level has a distinct scope and set of operations.
+Achords operates across three levels. Each level has a distinct scope and status.
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
-│  PLATFORM (Organization)                                    │
+│  ORGANIZATION BASE                                          │
+│  Status: ✅ Stable                                          │
 │  Scope: GitHub org, team onboarding                         │
 │  Skills: org-bootstrap, org-join                            │
 └─────────────────────────────────────────────────────────────┘
                             │
                             ▼
 ┌─────────────────────────────────────────────────────────────┐
-│  REPOSITORY                                                 │
+│  REPOSITORY RULES                                           │
+│  Status: 🚧 In Development                                 │
 │  Scope: Single repo, claim management, CI                   │
 │  Skills: achords-init, agent-union, claims, alignment       │
 └─────────────────────────────────────────────────────────────┘
@@ -19,13 +21,15 @@ Achords operates across three levels. Each level has a distinct scope and set of
                             ▼
 ┌─────────────────────────────────────────────────────────────┐
 │  AGENT                                                      │
+│  Status: 📋 Planned                                         │
 │  Scope: Individual agent, contribution workflow             │
-│  Operations: Register, claim, work, PR                      │
+│  TBD: Name and scope still being defined                    │
 └─────────────────────────────────────────────────────────────┘
 ```
 
-## Platform Level
+## Organization Base
 
+**Status**: ✅ Stable (main branch)  
 **Scope**: GitHub organization  
 **Owner**: Organization admin  
 **One-time**: Set up once per org
@@ -44,8 +48,9 @@ your-org/
 └── .skills/          # Shared skills library
 ```
 
-## Repository Level
+## Repository Rules
 
+**Status**: 🚧 In Development (feature branch)  
 **Scope**: Single repository  
 **Owner**: Repository maintainers  
 **Per-repo**: Initialize once per repo
@@ -66,51 +71,35 @@ your-repo/
 │   ├── registry.json       # Agent registry
 │   ├── claims.json         # Active claims
 │   ├── events.ndjson       # Audit log
-│   ├── schemas/            # JSON schemas
-│   └── skills/             # Protocol skills
+│   └── schemas/            # JSON schemas
 └── .github/workflows/
     ├── achords-union.yml
     └── achords-alignment-check.yml
 ```
 
-## Agent Level
+## Agent
 
+**Status**: 📋 Planned  
 **Scope**: Individual agent  
 **Owner**: The agent itself  
-**Continuous**: Every contribution
+**Name**: TBD
 
-### Workflow
+### Planned Features
 
-```
-1. Read AGENTS.md (mandatory)
-        ↓
-2. Register via agent-union
-        ↓
-3. Declare claim before editing
-        ↓
-4. Make changes
-        ↓
-5. Open PR
-        ↓
-6. CI validates → merge or block
-```
+- Agent registration
+- Claim lifecycle
+- Inbox messaging
+- State tracking
 
-## Data Flow
+## Branch Strategy
 
 ```
-Platform setup
-    ↓
-Repository initialization
-    ↓
-Agent registration
-    ↓
-Claim declaration
-    ↓
-Code changes
-    ↓
-PR + CI validation
-    ↓
-Merge + event logged
+main
+├── Organization Base (stable)
+└── Documentation
+
+feat/repository-rules
+└── Repository Rules (in development)
 ```
 
 ---

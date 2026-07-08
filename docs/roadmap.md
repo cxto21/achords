@@ -6,62 +6,73 @@ Current status and planned features.
 
 | Status | Meaning |
 |--------|---------|
-| ✅ Ready | Fully implemented, tested, documented |
-| 🚧 In Progress | Partially implemented, being refined |
+| ✅ Stable | Fully implemented, tested, documented |
+| 🚧 In Development | Being built, not yet complete |
 | 📋 Planned | Designed but not yet implemented |
 
-## Platform Level
+## Organization Base
+
+**Status**: ✅ Stable  
+**Branch**: main
 
 | Feature | Status | Notes |
 |---------|--------|-------|
-| `org-bootstrap` | 🚧 In Progress | Basic flow works, error handling being refined |
-| `org-join` | ✅ Ready | Clones repos, sets up environment |
-| `.engram` integration | ✅ Ready | Shared memory as submodule |
-| Multi-org support | ✅ Ready | `.env` configuration |
+| `org-bootstrap` | ✅ Stable | Creates org structure |
+| `org-join` | ✅ Stable | Team member onboarding |
+| `.engram` integration | ✅ Stable | Shared memory submodule |
+| Multi-org support | ✅ Stable | `.env` configuration |
+| Error handling | ✅ Stable | Pre-checks, conflict detection |
 
-## Repository Level
+## Repository Rules
+
+**Status**: 🚧 In Development  
+**Branch**: feat/repository-rules
 
 | Feature | Status | Notes |
 |---------|--------|-------|
-| `achords-init` | 📋 Planned | Will bootstrap `.achords/` structure |
+| `achords-init` | 🚧 In Development | Bootstrap protocol |
 | `agent-union` | 📋 Planned | Agent registration |
 | `claim-declaration` | 📋 Planned | Intent declaration |
 | `claim-collision-check` | 📋 Planned | Overlap detection |
 | `alignment-verify` | 📋 Planned | CI validation |
 
-## Agent Level
+## Agent
+
+**Status**: 📋 Planned  
+**Branch**: TBD
 
 | Feature | Status | Notes |
 |---------|--------|-------|
-| Claim lifecycle | 📋 Planned | Create → active → released/expired |
-| Inbox messaging | 📋 Planned | Agent-to-agent communication |
-| State tracking | 📋 Planned | Activity and status |
+| Name and scope | 📋 Planned | Being defined |
+| Registration | 📋 Planned | — |
+| Claim lifecycle | 📋 Planned | — |
+| Inbox messaging | 📋 Planned | — |
+| State tracking | 📋 Planned | — |
 
 ## Documentation
 
 | Document | Status | Notes |
 |----------|--------|-------|
-| Protocol overview | ✅ Ready | `docs/protocol.md` |
-| Architecture | ✅ Ready | `docs/architecture.md` |
-| Collaboration modes | ✅ Ready | `docs/collaboration.md` |
-| Getting started | 🚧 In Progress | Being written |
-| Full specification | 📋 Planned | `protocol/specification.md` |
+| Protocol overview | ✅ Stable | `docs/protocol.md` |
+| Architecture | ✅ Stable | `docs/architecture.md` |
+| Collaboration modes | ✅ Stable | `docs/collaboration.md` |
+| Getting started | ✅ Stable | `docs/getting-started.md` |
+| Full specification | 🚧 In Development | `protocol/specification.md` |
 
 ## Completed
 
-- [x] Repository structure reorganization
-- [x] Platform skills (org-bootstrap, org-join)
-- [x] Developer setup script
-- [x] `.engram` shared memory integration
-- [x] `.env` configuration support
-- [x] Error handling and pre-checks
+- [x] Repository restructure
+- [x] Organization Base implementation
 - [x] Documentation structure
+- [x] `.engram` integration
+- [x] `.env` configuration
+- [x] Error handling
 
-## In Progress
+## In Development
 
-- [ ] Org bootstrap error handling refinement
-- [ ] Getting started guide
-- [ ] achords-init implementation
+- [ ] Repository Rules implementation
+- [ ] achords-init script
+- [ ] Agent-level design
 
 ## Planned
 
@@ -70,8 +81,7 @@ Current status and planned features.
 - [ ] CI workflow templates
 - [ ] JSON schemas
 - [ ] Collision detection
-- [ ] Policy configuration
 
 ---
 
-*This roadmap is updated as features are implemented.*
+*Updated as features move from Planned → In Development → Stable.*
