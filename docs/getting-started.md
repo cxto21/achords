@@ -1,6 +1,6 @@
-# Getting Started
+# Getting Started — Organization Base
 
-Set up Achords in your project in 5 minutes.
+Set up your GitHub organization for multi-agent collaboration in 5 minutes.
 
 ## Prerequisites
 
@@ -13,7 +13,7 @@ Set up Achords in your project in 5 minutes.
 ### 1. Clone this repo
 
 ```bash
-git clone https://github.com/your-org/achords.git
+git clone https://github.com/cxto21/achords.git
 cd achords
 ```
 
@@ -32,16 +32,26 @@ bash scripts/dev-setup.sh
 
 This adds `.engram` shared memory to your project.
 
-## For Organization Owners
-
-Set up your GitHub organization:
+## Bootstrap Your Organization
 
 ```bash
 # Basic bootstrap
-bash templates/skills/platform/org-bootstrap/scripts/bootstrap.sh YourOrg
+bash bootstrap.sh YourOrg
 
 # With team skills from external repo
-bash templates/skills/platform/org-bootstrap/scripts/bootstrap.sh YourOrg https://github.com/your-org/team-skills.git
+bash bootstrap.sh YourOrg https://github.com/your-org/team-skills.git
+```
+
+### What It Creates
+
+```
+your-org/
+├── .github/          # Organization profile (public)
+├── .internal/        # Team docs, onboarding
+│   └── skills/
+│       └── join-team/
+│           └── setup.sh
+└── .skills/          # Shared skills library
 ```
 
 ## For Team Members
@@ -52,22 +62,18 @@ Join an existing organization:
 bash templates/skills/platform/org-join/scripts/setup.sh YourOrg
 ```
 
-## For Repository Setup
-
-Initialize Achords in a repository:
-
-```bash
-bash templates/achords-init.sh
-```
-
 ## What Happens Next
 
 After setup:
 
 1. **Read `AGENTS.md`** in your project — mandatory rules
-2. **Register as an agent** — `agent-union` skill
-3. **Declare claims** — before editing code
-4. **Open PRs** — CI validates compliance
+2. **Add team members** — they run `org-join`
+3. **Create repositories** — use Achords in them
+
+## Next Steps
+
+- [Architecture](./architecture.md) — Understand the three-level design
+- [Roadmap](./roadmap.md) — See all products and their status
 
 ## Troubleshooting
 
@@ -82,4 +88,4 @@ Safe to re-run. Scripts skip existing files.
 
 ---
 
-*Next: [Protocol](./protocol.md) — Understand how Achords works.*
+*Next: [Architecture](./architecture.md) — Understand the three-level design.*

@@ -1,55 +1,37 @@
-# Templates
+# Templates — Organization Base
 
-Files that get copied to projects when initializing Achords.
+Files that get copied to projects when initializing an organization.
 
 ## Structure
 
 ```
 templates/
-├── achords-init.sh          # Repository initialization script
-├── skills/
-│   ├── platform/            # Organization-level skills
-│   │   ├── org-bootstrap/
-│   │   └── org-join/
-│   └── repo/                # Repository-level skills
-│       ├── achords-init/
-│       ├── agent-union/
-│       ├── claim-declaration/
-│       ├── claim-collision-check/
-│       └── alignment-verify/
-├── schemas/                 # JSON schemas for protocol files
-│   ├── agent-profile.schema.json
-│   ├── agent-state.schema.json
-│   ├── claim.schema.json
-│   └── message.schema.json
-└── workflows/               # GitHub Actions workflows
-    ├── achords-union.yml
-    └── achords-alignment-check.yml
+└── skills/
+    └── platform/            # Organization-level skills
+        ├── org-bootstrap/   # Create org structure
+        └── org-join/        # Team member onboarding
 ```
 
 ## Usage
 
 ### Automatic
 
-Run `achords-init.sh` in your project:
+Run `bootstrap.sh` from the root:
 
 ```bash
-bash templates/achords-init.sh
+bash bootstrap.sh YourOrg
 ```
 
 ### Manual
 
-Copy specific files:
+Copy specific skills:
 
 ```bash
-# Copy a skill
-cp -r templates/skills/repo/agent-union/ .achords/skills/
+# Copy org-bootstrap skill
+cp -r templates/skills/platform/org-bootstrap/ /path/to/skills/
 
-# Copy a schema
-cp templates/schemas/claim.schema.json .achords/schemas/
-
-# Copy a workflow
-cp templates/workflows/achords-alignment-check.yml .github/workflows/
+# Copy org-join skill
+cp -r templates/skills/platform/org-join/ /path/to/skills/
 ```
 
 ## Customization
@@ -57,8 +39,7 @@ cp templates/workflows/achords-alignment-check.yml .github/workflows/
 These templates are starting points. Modify them for your team:
 
 - Edit `skills/*/SKILL.md` to add team-specific instructions
-- Modify `schemas/*.json` to extend protocol entities
-- Update `workflows/*.yml` to adjust CI behavior
+- Modify `scripts/*.sh` to adjust behavior
 
 ---
 
