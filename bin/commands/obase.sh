@@ -274,7 +274,7 @@ create_repos() {
       fi
       
       info "Creating ${repo} (${visibility})..."
-      gh repo create "${ORG_NAME}/${repo}" --"${visibility}" --description "$desc" --quiet
+      gh repo create "${ORG_NAME}/${repo}" --"${visibility}" --description "$desc"
       ok "${repo} created"
     fi
   done
