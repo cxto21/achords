@@ -508,18 +508,7 @@ ${repos_table}
       return 0
     fi
     
-    # Ask user to confirm push
-    echo ""
-    read -rp "  Commit and push changes? [Y/n] " -n 1 confirm
-    echo ""
-    
-    if [[ "$confirm" =~ ^[Nn]$ ]]; then
-      info "Skipping push"
-      echo "  Changes saved locally in: ${github_dir}"
-      return 0
-    fi
-    
-    # Commit and push
+    # Commit and push silently
     info "Committing changes..."
     git add -A
     git commit -m "update: repos table" --quiet
@@ -531,6 +520,41 @@ ${repos_table}
       err "Push failed"
       echo "  Check your permissions and try again."
       return 1
+    fi
+  else
+    # No --push flag: ask user
+    local github_dir="${WORK_DIR}/.github"
+    
+    if [ -d "$github_dir/.git" ]; then
+      cd "$github_dir"
+      
+      local status
+      status=$(git status --porcelain 2>/dev/null)
+      
+      if [ -n "$status" ]; then
+        echo ""
+        read -rp "  Commit and push changes? [Y/n] " -n 1 confirm
+        echo ""
+        
+        if [[ ! "$confirm" =~ ^[Nn]$ ]]; then
+          info "Committing changes..."
+          git add -A
+          git commit -m "update: repos table" --quiet
+          
+          info "Pushing to remote..."
+          if git push --quiet 2>/dev/null; then
+            ok "Changes pushed to remote"
+          else
+            err "Push failed"
+            echo "  Check your permissions and try again."
+          fi
+        else
+          info "Skipping push"
+          echo "  Changes saved locally in: ${github_dir}"
+        fi
+      else
+        ok "No changes to commit"
+      fi
     fi
   fi
   
