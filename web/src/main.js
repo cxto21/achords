@@ -13,7 +13,7 @@ document.addEventListener('DOMContentLoaded', () => {
     })
   })
 
-  // Waveform interaction
+  // Waveform interaction — mouse
   window.addEventListener('mousemove', (e) => {
     const bars = document.querySelectorAll('.waveform-bar')
     const index = Math.floor((e.clientX / window.innerWidth) * bars.length)
@@ -25,6 +25,22 @@ document.addEventListener('DOMContentLoaded', () => {
       }, 300)
     }
   })
+
+  // Waveform auto-animation
+  function animateWaveform() {
+    const bars = document.querySelectorAll('.waveform-bar')
+    if (bars.length === 0) return
+    // Pick 3 random bars to animate
+    for (let i = 0; i < 3; i++) {
+      const idx = Math.floor(Math.random() * bars.length)
+      const bar = bars[idx]
+      if (bar) {
+        bar.style.height = `${Math.random() * 95}%`
+        bar.style.transition = 'height 0.3s ease'
+      }
+    }
+  }
+  setInterval(animateWaveform, 400)
 
   // Logo click effect
   const logo = document.querySelector('.logo-text')

@@ -19,9 +19,16 @@ export const translations = {
       title2: "DE LA IA.",
       subtitle: "Diseñado para equipos de desarrollo que migran a sistemas de agentes. Orquestación de precisión para transformar flujos de trabajo en sinfonías automatizadas de código.",
       starGitHub: "Star on GitHub",
-      docs: "Documentación →",
+      docs: "Documentación",
       terminal: "Terminal",
       command: "npx achords obase",
+    },
+    // Docs dropdown
+    docs: {
+      forHumans: "Para Humanos",
+      forHumansDesc: "Docs interactivas con ejemplos",
+      forAgents: "Para Agentes",
+      forAgentsDesc: "Skills y protocolo directo",
     },
     // Products
     products: {
@@ -106,9 +113,16 @@ export const translations = {
       title2: "OF AI.",
       subtitle: "Designed for development teams migrating to agent systems. Precision orchestration to transform workflows into automated code symphonies.",
       starGitHub: "Star on GitHub",
-      docs: "Documentation →",
+      docs: "Documentation",
       terminal: "Terminal",
       command: "npx achords obase",
+    },
+    // Docs dropdown
+    docs: {
+      forHumans: "For Humans",
+      forHumansDesc: "Interactive docs with examples",
+      forAgents: "For Agents",
+      forAgentsDesc: "Skills and direct protocol",
     },
     // Products
     products: {
