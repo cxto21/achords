@@ -13,11 +13,11 @@ Creates the foundation for multi-agent development in your GitHub organization:
 ## Quick start
 
 ```bash
-# Interactive setup
-bash obase.sh
+# Using CLI
+./bin/achords obase
 
 # Or specify org name
-bash obase.sh MyOrg
+./bin/achords obase --org MyOrg
 ```
 
 ## First run
@@ -34,13 +34,13 @@ The script will check for `.env` and prompt you to configure:
 
   Organization name: MyOrg
   Skills repo URL (optional, press Enter to skip):
-  Work directory [/home/user/Poincare]:
+  Work directory [/home/user/achords-workspace]:
 ```
 
 ## What it creates
 
 ```
-~/Poincare/
+~/achords-workspace/
 ├── .github/
 │   └── profile/
 │       └── README.md      # Organization profile
@@ -59,9 +59,17 @@ The `.env` file stores your organization settings:
 
 ```bash
 ORG_NAME=MyOrg                    # Your GitHub org name
-WORK_DIR=/home/user/Poincare      # Where to clone repos
+WORK_DIR=/home/user/achords-workspace  # Where to clone repos
 SKILLS_REPO_URL=                  # Optional: import skills
 ```
+
+## Options
+
+| Flag | Description | Default |
+|------|-------------|---------|
+| `--org <name>` | Organization name | Prompted |
+| `--skills <url>` | Skills repository URL | None |
+| `--dir <path>` | Work directory | `~/achords-workspace` |
 
 ## Prerequisites
 
@@ -71,7 +79,7 @@ SKILLS_REPO_URL=                  # Optional: import skills
 
 ## Next steps
 
-After running `obase.sh`:
+After running `obase`:
 
 1. Edit `.github/profile/README.md` — your org's public page
 2. Add team members — they run the join script

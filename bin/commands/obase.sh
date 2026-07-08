@@ -52,7 +52,7 @@ show_help() {
   echo "  Options:"
   echo "    --org <name>      Organization name"
   echo "    --skills <url>    Skills repository URL"
-  echo "    --dir <path>      Work directory (default: ~/Poincare)"
+  echo "    --dir <path>      Work directory (default: ~/achords-workspace)"
   echo "    --help, -h        Show this help"
   echo ""
   echo "  Examples:"
@@ -66,7 +66,7 @@ show_help() {
 parse_args() {
   ORG_NAME=""
   SKILLS_URL=""
-  WORK_DIR="${HOME}/Poincare"
+  WORK_DIR="${HOME}/achords-workspace"
   
   while [ $# -gt 0 ]; do
     case "$1" in
@@ -87,6 +87,13 @@ parse_args() {
         exit 0
         ;;
       *)
+        # Unknown flag - show help
+        if [[ "$1" == --* ]]; then
+          err "Unknown option: $1"
+          echo ""
+          show_help
+          exit 1
+        fi
         # Treat as org name for backwards compatibility
         if [ -z "$ORG_NAME" ]; then
           ORG_NAME="$1"

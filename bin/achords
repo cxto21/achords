@@ -89,14 +89,8 @@ show_product_help() {
     exit 1
   fi
   
-  # Show product banner and help
-  if grep -q "^show_help" "$cmd_file"; then
-    source "$cmd_file"
-    show_help
-  else
-    err "No help available for ${product}"
-    exit 1
-  fi
+  # Run command with --help
+  "$cmd_file" --help
 }
 
 # ── run product command ──────────────────────────────────────────────
@@ -114,7 +108,7 @@ run_product() {
   
   # Make executable and run
   chmod +x "$cmd_file"
-  source "$cmd_file" "$@"
+  "$cmd_file" "$@"
 }
 
 # ── main ─────────────────────────────────────────────────────────────
@@ -141,6 +135,12 @@ main() {
   
   # Check if it's a help request for a product
   if [ $# -gt 0 ] && { [ "$1" = "--help" ] || [ "$1" = "-h" ]; }; then
+    show_product_help "$product"
+    exit 0
+  fi
+  
+  # No args after product - show product help
+  if [ $# -eq 0 ]; then
     show_product_help "$product"
     exit 0
   fi
