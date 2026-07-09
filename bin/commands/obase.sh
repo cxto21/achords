@@ -385,7 +385,22 @@ EOF
   sed -i "s/\"ORG_NAME\"/\"${ORG_NAME}\"/g" version.json
   
   # Create AGENTS.md - the main entry point for agents
-  cat > AGENTS.md << 'EOF'
+  local achords_version
+  achords_version=$(get_version)
+  
+  cat > AGENTS.md << EOF
+<!-- achords:header:v${achords_version} -->
+<!-- achords:resources -->
+| Resource | Path | Purpose |
+|----------|------|---------|
+| Org Rules | \`.achords/AGENTS.md\` | Organization-wide agent rules |
+| Org Memory | \`.achords/.engram/\` | Shared knowledge (git-synced) |
+| Conventions | \`.achords/config/conventions.json\` | Code conventions |
+| Policies | \`.achords/config/policies.json\` | Org policies |
+| Skills | \`.skills/skills/\` | Shared skills (Agent Skills spec) |
+| Onboarding | \`.internal/onboarding/\` | Setup scripts and docs |
+<!-- achords:end -->
+
 # .achords — Agent Orchestration Rules
 
 > This file defines how AI agents work within this organization.
@@ -393,76 +408,63 @@ EOF
 
 ## Reading Order
 
-Always read in this order:
-
-1. `.achords/AGENTS.md` — This file (org-wide rules)
-2. `.achords/config/conventions.json` — Code conventions
-3. `.achords/config/policies.json` — Org policies
-4. `repo/.engram/config.json` — Repo context
-5. `repo/AGENTS.md` — Repo-specific rules
-
-## Structure
-
-| Path | Purpose |
-|------|---------|
-| `version.json` | Current version and metadata |
-| `.engram/` | Shared org memory (git-synced) |
-| `config/` | Organization-wide policies and schemas |
-| `skills/` | Shared skills (Agent Skills spec) |
+1. \`.achords/AGENTS.md\` — This file (org-wide rules)
+2. \`.achords/config/conventions.json\` — Code conventions
+3. \`.achords/config/policies.json\` — Org policies
+4. \`repo/.engram/config.json\` — Repo context
+5. \`repo/AGENTS.md\` — Repo-specific rules
 
 ## Memory Protocol
 
 ### At Session Start
 
-```bash
+\`\`\`bash
 # Update .achords submodule
 git submodule update --remote .achords
 
 # Load org knowledge
-mem_search(project: "ORG_NAME", query: "conventions", limit: 5)
-```
+mem_search(project: "${ORG_NAME}", query: "conventions", limit: 5)
+\`\`\`
 
 ### During Work
 
 Save after significant decisions:
 
-```bash
-# Org-wide pattern
+\`\`\`bash
 mem_save(
-  project: "ORG_NAME",
+  project: "${ORG_NAME}",
   title: "Decision: use pattern X",
   type: "decision",
   content: "We decided to use X because...",
   topic_key: "decisions/architecture"
 )
-```
+\`\`\`
 
 ### At Session End
 
-```bash
+\`\`\`bash
 mem_session_summary(content: "## Goal\n...## Accomplished\n...")
-```
+\`\`\`
 
 ## Skills
 
 Skills follow the [Agent Skills specification](https://agentskills.io/specification):
 
-```bash
+\`\`\`bash
 cat .skills/skills/testing/SKILL.md
-```
+\`\`\`
 
 ## Modification Rules
 
-- **Don't modify** `.achords/` directly
-- **Don't modify** other repos' `.engram/config.json`
+- **Don't modify** \`.achords/\` directly
 - **Do modify** current repo files
-- **Do create** shared skills in `.skills/skills/`
+- **Do create** shared skills in \`.skills/skills/\`
 
 ## Versioning
 
 When the organization updates agent rules:
 1. Update files in this repo
-2. Bump version in `version.json`
+2. Bump version in \`version.json\`
 3. All repos pull the latest via submodule update
 EOF
   
@@ -855,7 +857,24 @@ EOF
   
   # Create AGENTS.md if not exists
   if [ ! -f "AGENTS.md" ]; then
+    local achords_version
+    achords_version=$(get_version)
+    
     cat > AGENTS.md << EOF
+<!-- achords:header:v${achords_version} -->
+<!-- achords:resources -->
+| Resource | Path | Purpose |
+|----------|------|---------|
+| Org Rules | \`.achords/AGENTS.md\` | Organization-wide agent rules |
+| Org Memory | \`.achords/.engram/\` | Shared knowledge (git-synced) |
+| Conventions | \`.achords/config/conventions.json\` | Code conventions |
+| Policies | \`.achords/config/policies.json\` | Org policies |
+| Skills | \`.skills/skills/\` | Shared skills (Agent Skills spec) |
+| Onboarding | \`.internal/onboarding/\` | Setup scripts and docs |
+| Repo Memory | \`.engram/\` | Isolated repo memory |
+| Repo Config | \`.engram/config.json\` | project_name setting |
+<!-- achords:end -->
+
 # ${repo_name}
 
 > Agent configuration for this repository.
