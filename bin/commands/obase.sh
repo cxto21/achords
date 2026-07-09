@@ -939,6 +939,30 @@ mem_session_summary(content: "## Goal\n...## Accomplished\n...")
 3. This file — Repo-specific rules
 4. On-demand files as needed
 
+## Skills (Versioned)
+
+Skills are versioned in \`.skills/\` with manifest tracking:
+
+\`\`\`bash
+# Load skill manifest
+cat .skills/skills/testing/manifest.json
+
+# Load specific version
+cat .skills/skills/testing/versions/v1.1.0.md
+
+# Load latest (symlink)
+cat .skills/skills/testing/SKILL.md
+\`\`\`
+
+### Fork/Variants
+
+Skills can have platform-specific forks:
+- \`v1.1.0.md\` — Standard version
+- \`v1.1.0-windows.md\` — Windows fork
+- \`v1.1.0-arm.md\` — ARM fork
+
+Check \`manifest.json\` for available versions and platforms.
+
 ## Repository-Specific Rules
 
 Add your repo-specific rules here.
