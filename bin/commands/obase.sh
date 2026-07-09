@@ -398,6 +398,7 @@ EOF
   
   cat > AGENTS.md << EOF
 <!-- achords:header:v${achords_version} -->
+<!-- achords:tags: { "product": "obase", "domain": "coordination", "type": "reference", "status": "stable", "audience": "agent" } -->
 <!-- achords:resources -->
 | Resource | Path | Purpose |
 |----------|------|---------|
@@ -870,6 +871,7 @@ EOF
     
     cat > AGENTS.md << EOF
 <!-- achords:header:v${achords_version} -->
+<!-- achords:tags: { "product": "obase", "domain": "coordination", "type": "reference", "status": "stable", "audience": "agent" } -->
 <!-- achords:resources -->
 | Resource | Path | Purpose |
 |----------|------|---------|
@@ -1154,6 +1156,7 @@ update_all_agents_headers() {
       # Generate new header
       cat > AGENTS.md << EOF
 <!-- achords:header:v${achords_version} -->
+<!-- achords:tags: { "product": "obase", "domain": "coordination", "type": "reference", "status": "stable", "audience": "agent" } -->
 <!-- achords:resources -->
 | Resource | Path | Purpose |
 |----------|------|---------|
@@ -1179,6 +1182,7 @@ EOF
       
       cat > AGENTS.md << EOF
 <!-- achords:header:v${achords_version} -->
+<!-- achords:tags: { "product": "obase", "domain": "coordination", "type": "reference", "status": "stable", "audience": "agent" } -->
 <!-- achords:resources -->
 | Resource | Path | Purpose |
 |----------|------|---------|
