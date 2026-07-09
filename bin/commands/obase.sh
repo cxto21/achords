@@ -597,7 +597,7 @@ generate_files() {
   cat > "${profile_dir}/README.md" << EOF
 # ${ORG_NAME}
 
-> Multi-agent development organization powered by [Achords](https://github.com/cxto21/achords).
+> Multi-agent development organization powered by [Achords](https://github.com/achords-org/achords).
 
 ## Repositories
 
@@ -664,7 +664,7 @@ update_profile() {
     cat > "$profile_file" << EOF
 # ${ORG_NAME}
 
-> Multi-agent development organization powered by [Achords](https://github.com/cxto21/achords).
+> Multi-agent development organization powered by [Achords](https://github.com/achords-org/achords).
 
 ## Repositories
 

@@ -21,7 +21,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/cxto21/achords.git"
+    "url": "https://github.com/achords-org/achords.git"
   },
   "keywords": [
     "multi-agent",
@@ -35,7 +35,7 @@
   "author": "achords-org",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/cxto21/achords/issues"
+    "url": "https://github.com/achords-org/achords/issues"
   },
   "homepage": "https://achords.pages.dev"
 }

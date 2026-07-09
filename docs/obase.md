@@ -87,4 +87,4 @@ After running `obase`:
 
 ---
 
-Part of the [Achords](https://github.com/cxto21/achords) ecosystem.
+Part of the [Achords](https://github.com/achords-org/achords) ecosystem.

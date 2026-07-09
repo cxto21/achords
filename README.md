@@ -6,7 +6,7 @@
 
 ```bash
 # Clone achords
-git clone https://github.com/cxto21/achords.git
+git clone https://github.com/achords-org/achords.git
 cd achords
 
 # Set up your organization

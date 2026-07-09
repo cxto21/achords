@@ -13,7 +13,7 @@ Set up your GitHub organization for multi-agent collaboration in 5 minutes.
 ### 1. Clone this repo
 
 ```bash
-git clone https://github.com/cxto21/achords.git
+git clone https://github.com/achords-org/achords.git
 cd achords
 ```
 
