@@ -12,8 +12,10 @@
     "LICENSE"
   ],
   "scripts": {
-    "build": "cd web && npm install && npm run build",
+    "build": "npm run build:docs && cd web && npm install && npm run build",
+    "build:docs": "cd web/docs/humans && npm install && npm run build",
     "dev": "cd web && npm install && npm run dev",
+    "dev:docs": "cd web/docs/humans && npm run serve",
     "preview": "cd web && npm run preview"
   },
   "repository": {
