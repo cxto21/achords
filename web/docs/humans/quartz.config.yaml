@@ -163,7 +163,7 @@ plugins:
     layout:
       position: beforeBody
       priority: 30
-  - source: ./quartz/plugins/page-title
+  - source: github:quartz-community/page-title
     enabled: true
     layout:
       position: left
