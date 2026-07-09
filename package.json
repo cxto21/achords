@@ -12,8 +12,9 @@
     "LICENSE"
   ],
   "scripts": {
-    "build": "npm run build:docs && cd web && npm install && npm run build",
-    "build:docs": "cd web/docs/humans && npm ci --ignore-scripts && npx quartz build && rm -rf ../../public/docs/humans && cp -r public ../../public/docs/humans",
+    "build": "cd web && npm install && npm run build",
+    "build:docs": "cd web/docs/humans && npm ci --ignore-scripts && npx quartz build && mkdir -p ../../dist/docs/humans && cp -r public/* ../../dist/docs/humans/",
+    "build:all": "npm run build && npm run build:docs",
     "dev": "cd web && npm install && npm run dev",
     "dev:docs": "cd web/docs/humans && npm run serve",
     "preview": "cd web && npm run preview"
