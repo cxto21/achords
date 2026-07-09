@@ -16,7 +16,14 @@
 set -euo pipefail
 
 # ── config ───────────────────────────────────────────────────────────
-ACHORDS_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+# Resolve symlinks (npx, npm global install) to find actual package dir
+ACHORDS_SOURCE="${BASH_SOURCE[0]}"
+while [ -L "$ACHORDS_SOURCE" ]; do
+  ACHORDS_SOURCE="$(readlink "$ACHORDS_SOURCE")"
+  # Handle relative symlinks
+  [[ "$ACHORDS_SOURCE" != /* ]] && ACHORDS_SOURCE="$(dirname "${BASH_SOURCE[0]}")/${ACHORDS_SOURCE}"
+done
+ACHORDS_DIR="$(cd "$(dirname "$ACHORDS_SOURCE")/.." && pwd)"
 COMMANDS_DIR="${ACHORDS_DIR}/bin/commands"
 
 # Read version from package.json (single source of truth)
