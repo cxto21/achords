@@ -37,3 +37,6 @@ web/docs/humans/public/
 
 # Engram local database (synced via manifest + chunks)
 .engram/engram.db
+
+# SDD working files (artifacts stored in .engram only)
+sdd/

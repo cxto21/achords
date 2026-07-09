@@ -48,6 +48,24 @@ warn()  { printf "\033[1;33m⚠\033[0m %s\n" "$*"; }
 err()   { printf "\033[1;31m✗\033[0m %s\n" "$*" >&2; }
 header(){ printf "\n\033[1;35m── %s ──\033[0m\n" "$*"; }
 
+# ── validate org/repo names ─────────────────────────────────────────
+validate_name() {
+  local name="$1"
+  local field="$2"  # "organization" or "repository"
+
+  # Prevents path traversal and command injection
+  # Must start with alphanumeric, can contain letters/numbers/dots/hyphens/underscores
+  # But no consecutive dots (path traversal) and no special chars
+  if [[ "$name" =~ ^[0-9A-Za-z][0-9A-Za-z._-]*$ ]] && [[ ! "$name" =~ \.\. ]]; then
+    return 0
+  else
+    err "${field^} name invalid: '${name}'"
+    echo "  Must match: ^[0-9A-Za-z][0-9A-Za-z._-]*\$"
+    echo "  Cannot contain consecutive dots (..) or special characters"
+    return 1
+  fi
+}
+
 # ── help ─────────────────────────────────────────────────────────────
 show_help() {
   local version
@@ -92,20 +110,27 @@ parse_args() {
   AUTO_PUSH=false
   REPO_NAME=""
   DIR_OVERRIDE=false
+  # CLI flag tracking (for .env precedence)
+  _ORG_SET=""
+  _SKILLS_SET=""
+  _WORK_DIR_SET=""
   
   while [ $# -gt 0 ]; do
     case "$1" in
       --org)
         ORG_NAME="$2"
+        _ORG_SET="true"
         shift 2
         ;;
       --skills)
         SKILLS_URL="$2"
+        _SKILLS_SET="true"
         shift 2
         ;;
       --dir)
         WORK_DIR="$2"
         DIR_OVERRIDE=true
+        _WORK_DIR_SET="true"
         shift 2
         ;;
       --repo)
@@ -139,6 +164,7 @@ parse_args() {
         # Treat as org name for backwards compatibility
         if [ -z "$ORG_NAME" ]; then
           ORG_NAME="$1"
+          _ORG_SET="true"
         fi
         shift
         ;;
@@ -146,18 +172,43 @@ parse_args() {
   done
 }
 
+# ── load .env safely (no shell execution) ────────────────────────────
+safe_load_env() {
+  local env_file="$1"
+  if [ ! -f "$env_file" ]; then
+    return 1
+  fi
+
+  while IFS= read -r line || [ -n "$line" ]; do
+    # Skip comments and empty lines
+    [[ "$line" =~ ^[[:space:]]*# ]] && continue
+    [[ -z "$line" ]] && continue
+
+    # Validate KEY=VALUE format (no shell commands allowed)
+    if [[ "$line" =~ ^[A-Za-z_][A-Za-z0-9_]*=.*$ ]]; then
+      local key="${line%%=*}"
+      local value="${line#*=}"
+      # Remove surrounding quotes if present
+      value="${value#\"}"
+      value="${value%\"}"
+      value="${value#\'}"
+      value="${value%\'}"
+      export "$key"="$value"
+    else
+      warn "Skipping invalid .env line: $line"
+    fi
+  done < "$env_file"
+}
+
 # ── load .env ────────────────────────────────────────────────────────
 load_env() {
   ENV_FILE="${WORK_DIR}/.env"
   if [ -f "$ENV_FILE" ]; then
-    set -a
-    source "$ENV_FILE"
-    set +a
-    
-    # Use .env values as defaults
-    ORG_NAME="${ORG_NAME:-$ORG_NAME}"
-    SKILLS_URL="${SKILLS_REPO_URL:-$SKILLS_URL}"
-    WORK_DIR="${WORK_DIR:-$WORK_DIR}"
+    # Only use .env values if CLI flags weren't explicitly set
+    if [ -z "${_ORG_SET:-}" ]; then
+      safe_load_env "$ENV_FILE"
+      _ORG_SET="true"
+    fi
   fi
 }
 
@@ -251,6 +302,11 @@ check_auth() {
 # ── check organization ───────────────────────────────────────────────
 check_org() {
   header "Checking organization"
+
+  # Validate org name before API call
+  if ! validate_name "$ORG_NAME" "organization"; then
+    exit 1
+  fi
   
   # Use API directly - more reliable than gh org view for newly created orgs
   if gh api "orgs/${ORG_NAME}" > /dev/null 2>&1; then
@@ -302,6 +358,11 @@ check_local() {
 # ── create repositories ──────────────────────────────────────────────
 create_repos() {
   header "Creating repositories"
+
+  # Validate org name
+  if ! validate_name "$ORG_NAME" "organization"; then
+    exit 1
+  fi
   
   for repo in .github .internal .skills .achords; do
     if gh repo view "${ORG_NAME}/${repo}" > /dev/null 2>&1; then
@@ -357,23 +418,25 @@ init_achords_repo() {
     return 1
   fi
   
-  cd "$achords_dir"
-  
-  # Check if already initialized
-  if [ -f "version.json" ]; then
-    ok ".achords already initialized"
-    return 0
-  fi
-  
-  # Create directory structure
-  mkdir -p config/schemas
-  mkdir -p skills
-  mkdir -p agents
-  mkdir -p templates
-  mkdir -p .engram/chunks
-  
-  # Create version.json
-  cat > version.json << 'EOF'
+  # Use subshell to prevent cd from leaking global state
+  (
+    cd "$achords_dir"
+    
+    # Check if already initialized
+    if [ -f "version.json" ]; then
+      ok ".achords already initialized"
+      exit 0
+    fi
+    
+    # Create directory structure
+    mkdir -p config/schemas
+    mkdir -p skills
+    mkdir -p agents
+    mkdir -p templates
+    mkdir -p .engram/chunks
+    
+    # Create version.json
+    cat > version.json << 'EOF'
 {
   "version": "1.0.0",
   "schema_version": "1.0.0",
@@ -389,14 +452,14 @@ init_achords_repo() {
   }
 }
 EOF
-  sed -i "s/TIMESTAMP/$(date -u +%Y-%m-%dT%H:%M:%SZ)/g" version.json
-  sed -i "s/\"ORG_NAME\"/\"${ORG_NAME}\"/g" version.json
-  
-  # Create AGENTS.md - the main entry point for agents
-  local achords_version
-  achords_version=$(get_version)
-  
-  cat > AGENTS.md << EOF
+    sed -i "s/TIMESTAMP/$(date -u +%Y-%m-%dT%H:%M:%SZ)/g" version.json
+    sed -i "s/\"ORG_NAME\"/\"${ORG_NAME}\"/g" version.json
+    
+    # Create AGENTS.md - the main entry point for agents
+    local achords_version
+    achords_version=$(get_version)
+    
+    cat > AGENTS.md << EOF
 <!-- achords:header:v${achords_version} -->
 <!-- achords:tags: { "product": "obase", "domain": "coordination", "type": "reference", "status": "stable", "audience": "agent" } -->
 <!-- achords:resources -->
@@ -476,9 +539,9 @@ When the organization updates agent rules:
 2. Bump version in \`version.json\`
 3. All repos pull the latest via submodule update
 EOF
-  
-  # Create default policies
-  cat > config/policies.json << 'EOF'
+    
+    # Create default policies
+    cat > config/policies.json << 'EOF'
 {
   "version": "1.0.0",
   "access": {
@@ -498,38 +561,38 @@ EOF
   }
 }
 EOF
-  sed -i "s/\"ORG_NAME\"/\"${ORG_NAME}\"/g" config/policies.json
-  
-  # Create empty schemas directory marker
-  cat > config/schemas/README.md << 'EOF'
+    sed -i "s/\"ORG_NAME\"/\"${ORG_NAME}\"/g" config/policies.json
+    
+    # Create empty schemas directory marker
+    cat > config/schemas/README.md << 'EOF'
 # Schemas
 
 Data schemas for agent communication and data exchange.
 EOF
-  
-  # Create skills README
-  cat > skills/README.md << 'EOF'
+    
+    # Create skills README
+    cat > skills/README.md << 'EOF'
 # Skills
 
 Shared skills across all repositories in this organization.
 EOF
-  
-  # Create agents README
-  cat > agents/README.md << 'EOF'
+    
+    # Create agents README
+    cat > agents/README.md << 'EOF'
 # Agents
 
 Agent-specific configurations and profiles.
 EOF
-  
-  # Create templates README
-  cat > templates/README.md << 'EOF'
+    
+    # Create templates README
+    cat > templates/README.md << 'EOF'
 # Templates
 
 Templates for new repositories and agent configurations.
 EOF
-  
-  # Create .gitignore for .engram
-  cat > .gitignore << 'EOF'
+    
+    # Create .gitignore for .engram
+    cat > .gitignore << 'EOF'
 # Engram local database (synced via manifest.json + chunks)
 .engram/engram.db
 
@@ -550,12 +613,13 @@ node_modules/
 .env
 .env.local
 EOF
-  
-  # Commit
-  git add -A
-  git commit -m "init: achords configuration structure with .engram" --quiet
-  
-  ok ".achords initialized"
+    
+    # Commit
+    git add -A
+    git commit -m "init: achords configuration structure with .engram" --quiet
+    
+    ok ".achords initialized"
+  )
 }
 
 # ── generate base files ──────────────────────────────────────────────
@@ -836,6 +900,11 @@ import_skills() {
 setup_repo_memory() {
   local repo_dir="$1"
   local repo_name="$2"
+  
+  # Validate repo name
+  if ! validate_name "$repo_name" "repository"; then
+    return 1
+  fi
   
   if [ ! -d "$repo_dir" ]; then
     return 1
@@ -1268,6 +1337,13 @@ main() {
     return
   fi
   
+  # Validate org name early if provided
+  if [ -n "$ORG_NAME" ]; then
+    if ! validate_name "$ORG_NAME" "organization"; then
+      exit 1
+    fi
+  fi
+  
   # Set WORK_DIR based on ORG_NAME if not overridden
   if [ "$DIR_OVERRIDE" = false ] && [ -n "$ORG_NAME" ]; then
     WORK_DIR="${HOME}/achords/${ORG_NAME}"
@@ -1280,6 +1356,11 @@ main() {
   
   # Handle --repo mode
   if [ -n "$REPO_NAME" ]; then
+    # Validate repo name early
+    if ! validate_name "$REPO_NAME" "repository"; then
+      exit 1
+    fi
+    
     # Load .env to get ORG_NAME
     load_env
     
@@ -1367,3 +1448,4 @@ main() {
 if [ "${BASH_SOURCE[0]}" = "${0}" ]; then
   main "$@"
 fi
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              
