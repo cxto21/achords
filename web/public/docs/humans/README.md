@@ -19,6 +19,20 @@ Obase is the layer that tells AI agents how to interpret achords resources. It g
 │  ├── config/                  ← Policies & conventions     │
 │  └── skills/                  ← Shared skills              │
 │                                                             │
+│  .skills/                     ← Versioned skills           │
+│  ├── version.json             ← Global version index       │
+│  └── skills/                  ← Skill directories          │
+│      ├── testing/                                        │
+│      │   ├── manifest.json    ← Version list              │
+│      │   ├── SKILL.md         ← Reference to latest       │
+│      │   └── versions/        ← Version files             │
+│      │       ├── v1.0.0.md                                 │
+│      │       └── v1.1.0.md                                 │
+│      └── code-review/                                     │
+│          ├── manifest.json                                 │
+│          ├── SKILL.md                                      │
+│          └── versions/                                     │
+│                                                             │
 │  repo/                         ← Your project              │
 │  ├── AGENTS.md                ← Repo-specific rules        │
 │  ├── .achords/ → (submodule)  ← Points to org rules        │
@@ -79,23 +93,84 @@ SESSION START
 4. **During work** — Save decisions as they happen
 5. **Session end** — Always summarize for next session
 
-## File Classification
+## Skill Versioning
 
-### Mandatory Files
+### Structure
 
-| File | Why Mandatory |
-|------|---------------|
-| `.achords/AGENTS.md` | Entry point for org rules |
-| `.engram/config.json` | Project name for memory isolation |
+```
+.skills/
+├── version.json                    # Global version index
+├── skills/
+│   ├── testing/
+│   │   ├── manifest.json           # Version list
+│   │   ├── SKILL.md                # Reference to latest
+│   │   └── versions/
+│   │       ├── v1.0.0.md           # Original
+│   │       └── v1.1.0.md           # Updated
+│   └── code-review/
+│       ├── manifest.json
+│       ├── SKILL.md
+│       └── versions/
+│           ├── v1.0.0.md
+│           └── v1.1.0.md
+```
 
-### On-Demand Files
+### Manifest Format
 
-| File | When to Read |
-|------|--------------|
-| `.achords/config/conventions.json` | Before writing code |
-| `.achords/config/policies.json` | Before access decisions |
-| `.skills/skills/*.md` | When task matches skill description |
-| `.internal/onboarding/` | When setting up new repo |
+```json
+{
+  "name": "testing",
+  "latest": "v1.1.0",
+  "versions": [
+    {
+      "version": "v1.0.0",
+      "file": "versions/v1.0.0.md",
+      "description": "Initial version",
+      "platforms": ["linux", "macos", "windows"],
+      "created": "2026-07-08"
+    },
+    {
+      "version": "v1.1.0",
+      "file": "versions/v1.1.0.md",
+      "description": "Added gotchas and validation",
+      "platforms": ["linux", "macos", "windows"],
+      "created": "2026-07-09"
+    }
+  ]
+}
+```
+
+### Forks/Variants
+
+Skills can have platform-specific forks:
+
+```
+versions/
+├── v1.1.0.md           # Standard version
+├── v1.1.0-windows.md   # Windows fork
+└── v1.1.0-arm.md       # ARM fork
+```
+
+Forks reference parent via `forked_from` in manifest:
+
+```json
+{
+  "version": "v1.1.0-windows",
+  "file": "versions/v1.1.0-windows.md",
+  "description": "Windows-specific fork",
+  "platforms": ["windows"],
+  "forked_from": "v1.1.0",
+  "created": "2026-07-09"
+}
+```
+
+### Why Versioned Skills?
+
+1. **History preserved** — explicit version files
+2. **Forks supported** — variants tracked
+3. **Manifest provides** — quick overview
+4. **Agent-friendly** — clear loading flow
+5. **Future-proof** — ai-on-ci integration planned
 
 ## Memory Isolation
 
@@ -118,31 +193,6 @@ SESSION START
 - Different repos have different contexts
 - Prevents memory pollution
 - Allows org-wide patterns without repo noise
-
-## Version Control
-
-### Header Versioning
-
-```markdown
-<!-- achords:header:v1.1.0 -->
-```
-
-- Changes when achords updates resources
-- Agent sees new resources in table
-- Repos pull via `git submodule update`
-
-### Resource Table
-
-| Resource | Path | Purpose |
-|----------|------|---------|
-| Org Rules | `.achords/AGENTS.md` | Organization-wide agent rules |
-| Org Memory | `.achords/.engram/` | Shared knowledge (git-synced) |
-| Conventions | `.achords/config/conventions.json` | Code conventions |
-| Policies | `.achords/config/policies.json` | Org policies |
-| Skills | `.skills/skills/` | Shared skills (Agent Skills spec) |
-| Onboarding | `.internal/onboarding/` | Setup scripts and docs |
-| Repo Memory | `.engram/` | Isolated repo memory |
-| Repo Config | `.engram/config.json` | project_name setting |
 
 ## Design Decisions
 
@@ -179,4 +229,11 @@ achords obase --repo my-repo --update-header
 ```bash
 # Full setup
 achords obase --repo my-repo
+```
+
+### Existing Skills
+
+```bash
+# Convert to versioned structure
+achords skills versionize testing
 ```
