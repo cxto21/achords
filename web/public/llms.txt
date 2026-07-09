@@ -1,0 +1,74 @@
+# Achords
+
+> Multi-agent orchestration protocol for software development
+
+Achords is an orchestration protocol that lets AI agents work together on software projects with shared knowledge, persistent memory, and consistent conventions across your organization.
+
+## Core Concepts
+
+- **Organization Base (obase)**: Sets up GitHub orgs for multi-agent collaboration
+- **Repository Coordination (rcord)**: Manages agent workflows within repos
+- **IA on CI (iaci)**: Runs agents in CI/CD pipelines
+- **KB Web (kbweb)**: Knowledge base web interface
+
+## Quick Start
+
+```bash
+# Install
+npm install -g achords
+
+# Setup organization
+achords obase --org MyOrg
+
+# Configure repo for agent memory
+achords obase --repo my-repo
+
+# Check version
+achords version
+```
+
+## Architecture
+
+```
+.achords/                    # Org rules (submodule)
+├── .engram/                 # Shared org memory
+├── AGENTS.md                # Agent orchestration rules
+├── config/                  # Policies & conventions
+└── skills/                  # Shared skills
+
+repo/
+├── .engram/                 # Repo-specific memory
+│   └── config.json          # project_name: "repo"
+├── .achords -> (submodule)  # Points to org rules
+└── AGENTS.md                # Repo agent config
+```
+
+## Memory
+
+- **Org memory**: Shared across all repos via `.achords/.engram/`
+- **Repo memory**: Isolated per repo via `.engram/config.json`
+- **Engram**: Persistent memory system (https://github.com/Gentleman-Programming/engram)
+
+## Skills
+
+Skills follow the [Agent Skills specification](https://agentskills.io/specification):
+
+```yaml
+---
+name: skill-name
+description: Use when... (1-1024 chars)
+metadata:
+  version: "1.0.0"
+---
+```
+
+## Docs
+
+- [For Agents](/docs/agents/) — How agents integrate with achords
+- [For Humans](/docs/humans/) — Developer setup and usage
+
+## Links
+
+- GitHub: https://github.com/achords-org
+- npm: https://www.npmjs.com/package/achords
+- Spec: https://agentskills.io/specification
