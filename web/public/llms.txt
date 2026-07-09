@@ -1,11 +1,52 @@
 # Achords
 
-Multi-agent orchestration protocol for software development.
+> Multi-agent coordination protocol for software teams. Agents share memory, rules, and skills across repositories.
 
-## Documentation
+Full human docs: https://achords.pages.dev/
+Agent docs: https://achords.pages.dev/llms.txt
 
-- [For Agents](https://achords.pages.dev/docs/agents/): How agents integrate with achords memory, skills, and conventions.
-- [For Humans](https://achords.pages.dev/docs/humans/): Developer setup, installation, and usage guide.
-- [Organization Base (obase)](https://github.com/cxto21/achords): CLI to initialize GitHub orgs for multi-agent collaboration.
-- [Agent Skills Spec](https://agentskills.io/specification): The specification achords skills follow.
-- [Engram](https://github.com/Gentleman-Programming/engram): Persistent memory system for agents.
+## Getting started
+
+- [Installation](https://achords.pages.dev/getting-started/installation.md): Install achords CLI and configure your first organization
+- [Quick start](https://achords.pages.dev/getting-started/quickstart.md): Bootstrap an org and onboard your first repo in 5 minutes
+- [Concepts](https://achords.pages.dev/getting-started/concepts.md): Organizations, repos, skills, and memory — the mental model
+
+## Architecture
+
+- [Organization structure](https://achords.pages.dev/architecture/org-structure.md): .achords, .skills, .internal — what lives where
+- [Repo integration](https://achords.pages.dev/architecture/repo-integration.md): How repos import org rules via git submodules
+- [Memory isolation](https://achords.pages.dev/architecture/memory-isolation.md): Shared org memory vs per-repo context
+- [Agent flow](https://achords.pages.dev/architecture/agent-flow.md): Session start → mandatory reads → work → session end
+
+## Skills
+
+- [Skill specification](https://achords.pages.dev/skills/specification.md): YAML frontmatter, SKILL.md structure, Agent Skills compatibility
+- [Versioning](https://achords.pages.dev/skills/versioning.md): Directory-based versioning, manifests, forks
+- [OS tagging](https://achords.pages.dev/skills/os-tagging.md): Platform-specific skills with family inheritance
+- [Creating skills](https://achords.pages.dev/skills/creating.md): Step-by-step guide to author new skills
+
+## Memory (Engram)
+
+- [Engram integration](https://achords.pages.dev/memory/engram.md): Persistent memory across sessions
+- [Memory protocol](https://achords.pages.dev/memory/protocol.md): When to save, search, and summarize
+- [Topic keys](https://achords.pages.dev/memory/topic-keys.md): Organizing memory by topic
+
+## CLI Reference
+
+- [achords obase](https://achords.pages.dev/cli/obase.md): Initialize organizations
+- [achords rcord](https://achords.pages.dev/cli/rcord.md): Repository coordination (coming soon)
+- [achords version](https://achords.pages.dev/cli/version.md): Check installed version
+- [achords update](https://achords.pages.dev/cli/update.md): Update to latest
+
+## Products
+
+- [obase](https://achords.pages.dev/products/obase.md): Organization Base — agent rules and structure
+- [rcord](https://achords.pages.dev/products/rcord.md): Repository Coordination — commit standards (coming soon)
+- [iaci](https://achords.pages.dev/products/iaci.md): IA on CI — automated agent reviews (coming soon)
+- [kbweb](https://achords.pages.dev/products/kbweb.md): KB Web — searchable knowledge base (coming soon)
+
+## Resources
+
+- [GitHub](https://github.com/achords-org): Source code and issues
+- [npm](https://www.npmjs.com/package/achords): Package registry
+- [Agent Skills spec](https://agentskills.io/specification): The spec we follow

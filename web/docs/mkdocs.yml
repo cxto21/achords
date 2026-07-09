@@ -1,0 +1,72 @@
+site_name: Achords
+site_description: Multi-agent coordination protocol for software teams
+site_url: https://achords.pages.dev/docs/
+
+theme:
+  name: material
+  palette:
+    - scheme: slate
+      primary: custom
+      toggle:
+        icon: material/brightness-7
+        name: Switch to light mode
+    - scheme: default
+      primary: custom
+      toggle:
+        icon: material/brightness-4
+        name: Switch to dark mode
+  font:
+    text: Inter
+    code: JetBrains Mono
+  features:
+    - navigation.tabs
+    - navigation.sections
+    - navigation.expand
+    - navigation.top
+    - content.code.copy
+    - content.code.annotate
+  icon:
+    repo: fontawesome/brands/github
+
+repo_url: https://github.com/achords-org/achords
+repo_name: achords-org/achords
+
+nav:
+  - Home: index.md
+  - Getting Started:
+    - Installation: getting-started/installation.md
+    - Quick Start: getting-started/quickstart.md
+    - Concepts: getting-started/concepts.md
+  - Architecture:
+    - Organization Structure: architecture/org-structure.md
+    - Repo Integration: architecture/repo-integration.md
+    - Memory Isolation: architecture/memory-isolation.md
+    - Agent Flow: architecture/agent-flow.md
+  - Skills:
+    - Specification: skills/specification.md
+    - Versioning: skills/versioning.md
+    - OS Tagging: skills/os-tagging.md
+    - Creating Skills: skills/creating.md
+  - Memory:
+    - Engram Integration: memory/engram.md
+    - Memory Protocol: memory/protocol.md
+    - Topic Keys: memory/topic-keys.md
+  - CLI:
+    - obase: cli/obase.md
+    - rcord: cli/rcord.md
+    - version: cli/version.md
+    - update: cli/update.md
+
+markdown_extensions:
+  - pymdownx.highlight:
+      anchor_linenums: true
+  - pymdownx.superfences
+  - pymdownx.tabbed:
+      alternate_style: true
+  - admonitions
+  - pymdownx.emoji:
+      emoji_index: !!python/name:material.extensions.emoji.twemoji
+      emoji_generator: !!python/name:material.extensions.emoji.to_svg
+
+extra_css:
+  - stylesheets/extra.css
