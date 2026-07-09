@@ -869,6 +869,7 @@ EOF
 | Org Memory | \`.achords/.engram/\` | Shared knowledge (git-synced) |
 | Conventions | \`.achords/config/conventions.json\` | Code conventions |
 | Policies | \`.achords/config/policies.json\` | Org policies |
+| Skills Rules | \`.skills/AGENTS.md\` | How to create/maintain skills |
 | Skills | \`.skills/skills/\` | Shared skills (Agent Skills spec) |
 | Onboarding | \`.internal/onboarding/\` | Setup scripts and docs |
 | Repo Memory | \`.engram/\` | Isolated repo memory |
@@ -884,8 +885,9 @@ EOF
 ### 1. Session Start (MANDATORY)
 
 \`\`\`bash
-# Sync org rules
+# Sync submodules
 git submodule update --remote .achords
+git submodule update --remote .skills
 
 # Load org context
 mem_search(project: "${ORG_NAME}", query: "recent changes", limit: 3)
@@ -899,6 +901,7 @@ mem_search(project: "${repo_name}", query: "last session", limit: 3)
 | File | Why |
 |------|-----|
 | \`.achords/AGENTS.md\` | Org rules + resource table |
+| \`.skills/AGENTS.md\` | How to create/maintain skills |
 | \`.engram/config.json\` | Project name: ${repo_name} |
 
 ### 3. On-Demand Reads (when needed)
@@ -907,7 +910,8 @@ mem_search(project: "${repo_name}", query: "last session", limit: 3)
 |------|--------------|
 | \`.achords/config/conventions.json\` | Before writing code |
 | \`.achords/config/policies.json\` | Before access decisions |
-| \`.skills/skills/*.md\` | When task matches skill description |
+| \`.skills/skills/*/manifest.json\` | When loading a skill |
+| \`.skills/skills/*/versions/*/SKILL.md\` | When using a skill |
 | \`.internal/onboarding/\` | When setting up new repo |
 
 ### 4. During Work
